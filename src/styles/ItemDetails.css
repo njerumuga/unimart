@@ -1,0 +1,53 @@
+.item-details {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.item-details img {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    border-radius: 12px;
+    object-fit: cover;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.item-details p.price {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.item-details a {
+    display: inline-block;
+    background-color: #25D366;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-top: 10px;
+}
+.whatsapp-btn {
+    background-color: #25d366;
+    color: white;
+    font-weight: bold;
+    padding: 12px 18px;
+    border-radius: 6px;
+    text-align: center;
+    display: inline-block;
+    margin-top: 15px;
+    text-decoration: none;
+    transition: background 0.3s ease;
+}
+
+.whatsapp-btn:hover {
+    background-color: #1ebc5d;
+}
+
+.no-phone {
+    margin-top: 10px;
+    color: #777;
+    font-style: italic;
+}

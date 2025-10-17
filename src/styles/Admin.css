@@ -1,0 +1,116 @@
+.admin-page {
+    max-width: 900px;
+    margin: 30px auto;
+    text-align: center;
+}
+
+.admin-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.admin-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    width: 260px;
+    padding: 15px;
+    text-align: left;
+}
+
+.admin-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.admin-card h3 {
+    color: #0047ab;
+    margin: 10px 0 5px;
+}
+
+.admin-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.admin-buttons button {
+    border: none;
+    border-radius: 5px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+}
+
+button.approve {
+    background-color: #28a745;
+}
+
+button.reject {
+    background-color: #dc3545;
+}
+
+button.approve:hover {
+    background-color: #1e7e34;
+}
+
+button.reject:hover {
+    background-color: #c82333;
+}
+.admin-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+button.delete {
+    background-color: red;
+}
+
+button.delete:hover {
+    background-color: darkred;
+}
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-buttons button {
+    background-color: #0047ab;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.tab-buttons button.active {
+    background-color: #007bff;
+}
+
+.admin-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.admin-buttons .approve {
+    background-color: #28a745;
+}
+.admin-buttons .revoke {
+    background-color: #f0ad4e;
+}
+.admin-buttons .delete {
+    background-color: #dc3545;
+}
+
+.admin-buttons button:hover {
+    opacity: 0.9;
+}

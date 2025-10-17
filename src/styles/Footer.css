@@ -1,0 +1,17 @@
+.footer {
+    background-color: #0047ab;
+    color: #fff;
+    text-align: center;
+    padding: 12px 0;
+    margin-top: 50px;
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    position: relative; /* ✅ no longer fixed */
+    bottom: auto;
+    width: 100%;
+}
+.footer:hover {
+    background-color: #0058cc;
+    transition: background-color 0.3s ease;
+}
