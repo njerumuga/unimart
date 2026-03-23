@@ -4,30 +4,25 @@ import { getStorage } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 
-// Debug: Check if .env.local variables are being read
-console.log("🔥 Firebase Config:", {
-    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-});
-
 const firebaseConfig = {
-    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.REACT_APP_FIREBASE_APP_ID,
-    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
+    apiKey: "AIzaSyD_upb6Vz1FawSYkrpvllGyEFmq241eAD4",
+    authDomain: "unimart-849a4.firebaseapp.com",
+    projectId: "unimart-849a4",
+    storageBucket: "unimart-849a4.firebasestorage.app",
+    messagingSenderId: "457224866085",
+    appId: "1:457224866085:web:1c738ba6d921e15a3eb2cc",
+    measurementId: "G-N6NYPVGDXN"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// Services
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 const analytics = getAnalytics(app);
 
-console.log("✅ Firebase initialized successfully");
+console.log("✅ Firebase connected successfully");
 
 export { auth, db, storage, analytics };
