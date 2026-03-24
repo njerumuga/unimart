@@ -46,12 +46,14 @@ export default function ItemDetails() {
 
     // ✅ WhatsApp button setup
     const phone = item?.sellerPhone?.trim();
+
     const whatsappMessage = encodeURIComponent(
         `Hi, I saw "${item.title}" posted on SokoHub and I’m interested. Is it still available?`
     );
 
-    const whatsappUrl = `https://wa.me/${item.sellerPhone}?text=${whatsappMessage}`;
-
+    const whatsappUrl = phone
+        ? `https://wa.me/${phone}?text=${whatsappMessage}`
+        : "#";
     return (
         <div className="item-details">
             {item.isFeatured && <div className="badge featured">FEATURED</div>}
