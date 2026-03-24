@@ -46,10 +46,11 @@ export default function ItemDetails() {
 
     // ✅ WhatsApp button setup
     const phone = item?.sellerPhone?.trim();
-    const message = encodeURIComponent(
-        `Hello, I'm interested in your item "${item.title}" listed on SmartFarm. Is it still available?`
+    const whatsappMessage = encodeURIComponent(
+        `Hi, I saw "${item.title}" posted on SokoHub and I’m interested. Is it still available?`
     );
-    const whatsappUrl = phone ? `https://wa.me/${phone}?text=${message}` : null;
+
+    const whatsappUrl = `https://wa.me/${item.sellerPhone}?text=${whatsappMessage}`;
 
     return (
         <div className="item-details">
