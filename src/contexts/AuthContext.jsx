@@ -71,24 +71,27 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, async (u) => {
             if (u) {
-                // Fetch user data from Firestore to get Admin status
+                // 1. Fetch user data from 'users' collection
                 const udoc = doc(db, "users", u.uid);
                 const snapshot = await getDoc(udoc);
+                const userData = snapshot.exists() ? snapshot.data() : {};
+
+                // 2. Double Check: Check if UID exists in a separate 'admins' collection
+                const adminRef = doc(db, "admins", u.uid);
+                const adminSnap = await getDoc(adminRef);
                 
-                if (snapshot.exists()) {
-                    const userData = snapshot.data();
-                    setUser({
-                        uid: u.uid,
-                        email: u.email,
-                        displayName: userData.displayName || u.displayName || "Comrade",
-                        ...userData
-                    });
-                    setIsAdmin(userData.isAdmin || false);
-                } else {
-                    // Fallback if document hasn't been created yet
-                    setUser(u);
-                    setIsAdmin(false);
-                }
+                // ✅ Final Admin Logic: True if field is true OR if they exist in admin collection
+                const userIsAdmin = userData.isAdmin === true || adminSnap.exists();
+
+                setUser({
+                    uid: u.uid,
+                    email: u.email,
+                    displayName: userData.displayName || u.displayName || "Comrade",
+                    ...userData,
+                    isAdmin: userIsAdmin
+                });
+
+                setIsAdmin(userIsAdmin);
             } else {
                 setUser(null);
                 setIsAdmin(false);
@@ -112,7 +115,8 @@ export function AuthProvider({ children }) {
         <AuthContext.Provider value={value}>
             {!loading ? children : (
                 <div className="flex h-screen items-center justify-center bg-soko-cream">
-                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-soko-yellow border-t-soko-dark"></div>
+                    {/* MUST-themed Loading Spinner */}
+                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#ffb800] border-t-[#00a651]"></div>
                 </div>
             )}
         </AuthContext.Provider>

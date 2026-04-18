@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom"; 
 import ItemCard from "../components/ItemCard";
 import { db } from "../firebase";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
@@ -8,7 +9,28 @@ import { categories } from "../data/categories";
 export default function Home() {
     const [items, setItems] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("All");
+    const [showSecretBtn, setShowSecretBtn] = useState(false); 
     const { isAdmin } = useAuth();
+
+    // ✅ FIXED: Hidden Admin Shortcut Logic
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            // This console.log helps you verify the keys are being pressed
+            // console.log("Key:", e.key, "Shift:", e.shiftKey);
+
+            if (e.shiftKey && (e.key === "A" || e.key === "a")) {
+                // Only toggle if the user is actually an admin in the system
+                if (isAdmin) {
+                    setShowSecretBtn((prev) => !prev);
+                } else {
+                    console.warn("Shortcut pressed, but user is not an Admin.");
+                }
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [isAdmin]); // ✅ Crucial: dependency ensures it knows your admin status
 
     useEffect(() => {
         const q = query(
@@ -18,7 +40,8 @@ export default function Home() {
         );
         const unsub = onSnapshot(q, (snap) => {
             const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-            setItems(isAdmin ? arr : arr.filter((i) => i.isApproved));
+            const visibleItems = isAdmin ? arr : arr.filter((i) => i.isApproved);
+            setItems(visibleItems);
         });
         return () => unsub();
     }, [isAdmin]);
@@ -29,7 +52,18 @@ export default function Home() {
     }, [items, selectedCategory]);
 
     return (
-        <div className="min-h-screen pb-24">
+        <div className="min-h-screen pb-24 relative">
+            
+            {/* ✅ SECRET ADMIN BUTTON */}
+            {showSecretBtn && isAdmin && (
+                <Link 
+                    to="/admin" 
+                    className="fixed bottom-10 right-10 z-[100] animate-bounce rounded-full bg-red-600 px-8 py-5 font-black uppercase tracking-widest text-white shadow-[0_20px_50px_rgba(220,38,38,0.5)] hover:bg-black transition-all"
+                >
+                    ⚠️ ADMIN DASHBOARD
+                </Link>
+            )}
+
             {/* HERO - MUST THEME */}
             <header className="relative bg-[#00a651] pt-24 pb-32 px-4 border-b-[12px] border-[#ffb800]">
                 <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
