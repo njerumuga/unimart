@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 function Navbar() {
-    const { user, logout, isAdmin } = useAuth();
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -16,123 +16,47 @@ function Navbar() {
     };
 
     return (
-        <nav className="sticky top-0 z-50 border-b border-yellow-200 bg-soko-dark text-white shadow-soft">
-            <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
-                <Link to="/" className="flex items-center gap-2">
-                    <div className="rounded-xl bg-soko-yellow px-3 py-2 font-extrabold text-soko-dark shadow">
-                        SH
+        <nav className="sticky top-0 z-50 bg-[#00a651] text-white shadow-lg border-b-4 border-[#ffb800]">
+            <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
+                <Link to="/" className="flex items-center gap-3 transition hover:opacity-90">
+                    <div className="rounded-xl bg-white p-1.5 shadow-sm">
+                        <div className="rounded-lg bg-[#ffb800] px-3 py-1 font-black text-black">
+                            SH
+                        </div>
                     </div>
                     <div>
-                        <h1 className="text-xl font-extrabold tracking-tight text-soko-yellow">
-                            SokoHub
+                        <h1 className="text-2xl font-black tracking-tighter text-white">
+                            Soko<span className="text-[#ffb800]">Hub</span>
                         </h1>
-                        <p className="text-xs text-yellow-100">Campus marketplace</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-green-100">Student Marketplace</p>
                     </div>
                 </Link>
 
-                <div className="hidden items-center gap-4 md:flex">
-                    <Link to="/" className="text-sm font-medium text-white hover:text-soko-yellow">
-                        Home
-                    </Link>
-
+                <div className="flex items-center gap-4">
                     {user && (
-                        <Link
-                            to="/post"
-                            className="text-sm font-medium text-white hover:text-soko-yellow"
-                        >
-                            Sell Item
+                        <Link to="/post" className="hidden text-sm font-bold uppercase tracking-tighter hover:text-[#ffb800] md:block">
+                            Sell
                         </Link>
                     )}
-
-                    {isAdmin && (
-                        <Link
-                            to="/admin"
-                            className="text-sm font-medium text-white hover:text-soko-yellow"
-                        >
-                            Admin Dashboard
-                        </Link>
-                    )}
-
+                    
                     <Link
                         to="/advertise"
-                        className="rounded-full bg-soko-yellow px-4 py-2 text-sm font-bold text-soko-dark transition hover:scale-105 hover:bg-yellow-300"
+                        className="rounded-full bg-[#ffb800] px-6 py-2 text-xs font-black uppercase text-black transition hover:scale-105 hover:bg-yellow-400"
                     >
                         Advertise
                     </Link>
 
-                    {user ? (
-                        <>
-                            <Link
-                                to="/profile"
-                                className="text-sm font-medium text-white hover:text-soko-yellow"
-                            >
-                                {user.displayName || "Profile"}
-                            </Link>
-
-                            <button
-                                onClick={handleLogout}
-                                className="rounded-full border border-white px-4 py-2 text-sm font-semibold text-white transition hover:bg-white hover:text-soko-dark"
-                            >
-                                Logout
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <Link to="/login" className="text-sm font-medium text-white hover:text-soko-yellow">
-                                Login
-                            </Link>
-
-                            <Link
-                                to="/signup"
-                                className="rounded-full bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700"
-                            >
-                                Sign Up
-                            </Link>
-                        </>
-                    )}
-                </div>
-            </div>
-
-            <div className="border-t border-white/10 px-4 py-3 md:hidden">
-                <div className="flex flex-wrap gap-3 text-sm">
-                    <Link to="/" className="text-white hover:text-soko-yellow">
-                        Home
-                    </Link>
-
-                    {user && (
-                        <Link to="/post" className="text-white hover:text-soko-yellow">
-                            Sell Item
-                        </Link>
-                    )}
-
-                    {isAdmin && (
-                        <Link to="/admin" className="text-white hover:text-soko-yellow">
-                            Admin
-                        </Link>
-                    )}
-
-                    <Link to="/advertise" className="text-white hover:text-soko-yellow">
-                        Advertise
-                    </Link>
+                    <div className="h-6 w-[1px] bg-white/20 mx-1 hidden md:block"></div>
 
                     {user ? (
-                        <>
-                            <Link to="/profile" className="text-white hover:text-soko-yellow">
-                                Profile
+                        <div className="flex items-center gap-4">
+                            <Link to="/profile" className="text-sm font-black text-[#ffb800]">
+                                {user.displayName?.split(' ')[0] || "Profile"}
                             </Link>
-                            <button onClick={handleLogout} className="text-white hover:text-soko-yellow">
-                                Logout
-                            </button>
-                        </>
+                            <button onClick={handleLogout} className="text-[10px] font-black uppercase text-green-100">Logout</button>
+                        </div>
                     ) : (
-                        <>
-                            <Link to="/login" className="text-white hover:text-soko-yellow">
-                                Login
-                            </Link>
-                            <Link to="/signup" className="text-white hover:text-soko-yellow">
-                                Sign Up
-                            </Link>
-                        </>
+                        <Link to="/login" className="text-sm font-black hover:text-[#ffb800]">Login</Link>
                     )}
                 </div>
             </div>

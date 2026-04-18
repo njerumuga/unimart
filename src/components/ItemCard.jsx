@@ -1,51 +1,64 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function ItemCard({ item }) {
+    const { user } = useAuth();
+    const navigate = useNavigate();
+
     if (!item) return null;
 
-    const isFeatured = item?.isFeatured || false;
-    const isApproved = item?.isApproved ?? true;
-    const imageUrl =
-        item?.imageUrl || "https://via.placeholder.com/600x400?text=No+Image";
+    const imageUrl = item?.imageUrl || "https://via.placeholder.com/600x400?text=No+Image";
+
+    const handleViewDetails = (e) => {
+        if (!user) {
+            e.preventDefault(); 
+            alert("Comrade, you need to Login first to see full details! 🤝");
+            navigate("/login");
+        }
+    };
 
     return (
-        <div className="group overflow-hidden rounded-2xl border border-yellow-100 bg-white shadow-soft transition duration-300 hover:-translate-y-1">
-            <div className="relative">
-                {isFeatured && (
-                    <span className="absolute left-3 top-3 z-10 rounded-full bg-soko-yellow px-3 py-1 text-xs font-extrabold text-soko-dark shadow">
-            FEATURED
-          </span>
-                )}
-
-                {!isApproved && (
-                    <span className="absolute right-3 top-3 z-10 rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-600 shadow">
-            Pending Approval
-          </span>
-                )}
-
+        <div className="group flex flex-col bg-white rounded-[32px] overflow-hidden transition-all duration-500 hover:shadow-2xl border-2 border-transparent hover:border-[#00a651] h-full shadow-soft">
+            {/* Image Section */}
+            <div className="relative aspect-square m-2 overflow-hidden rounded-[24px]">
                 <img
                     src={imageUrl}
-                    alt={item?.title || "Item image"}
-                    className="h-56 w-full object-cover"
+                    alt={item?.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
+                <div className="absolute top-4 right-4">
+                    <div className="bg-[#00a651] text-[#ffb800] px-4 py-2 rounded-2xl shadow-lg">
+                        <p className="font-black text-sm">
+                            KSh {Number(item?.price || 0).toLocaleString()}
+                        </p>
+                    </div>
+                </div>
             </div>
 
-            <div className="space-y-3 p-4">
-                <h3 className="line-clamp-1 text-lg font-bold text-soko-dark">
-                    {item?.title || "Untitled Item"}
-                </h3>
+            {/* Content Section */}
+            <div className="flex flex-col flex-1 p-6 pt-2">
+                <div className="mb-6">
+                    <p className="text-[10px] uppercase tracking-widest font-black text-[#00a651] mb-1">
+                        {item?.category || "Listing"}
+                    </p>
+                    <h3 className="text-xl font-bold text-gray-900 line-clamp-1">
+                        {item?.title}
+                    </h3>
+                </div>
 
-                <p className="text-2xl font-extrabold text-green-700">
-                    KSh {Number(item?.price || 0).toLocaleString()}
-                </p>
+                <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-2">
+                        <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center text-[8px] font-black text-[#00a651]">
+                            {item?.userName?.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="text-xs font-bold text-gray-500">{item?.userName?.split(' ')[0]}</span>
+                    </div>
+                    <span className="text-[10px] font-black uppercase text-[#00a651] tracking-tighter italic">Verified ●</span>
+                </div>
 
-                <p className="text-sm text-soko-muted">
-                    Seller: <span className="font-semibold text-soko-dark">{item?.userName || "Unknown"}</span>
-                </p>
-
-                <Link to={`/item/${item?.id}`} className="block">
-                    <button className="w-full rounded-xl bg-soko-dark px-4 py-3 font-semibold text-white transition hover:bg-green-700">
+                <Link to={`/item/${item?.id}`} onClick={handleViewDetails} className="mt-auto">
+                    <button className="w-full bg-[#ffb800] text-black py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all hover:bg-[#00a651] hover:text-white shadow-md active:scale-95">
                         View Details
                     </button>
                 </Link>

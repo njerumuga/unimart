@@ -2,17 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Meru University Inspired Palette */
+  --soko-green: #00a651;   
+  --soko-gold: #ffb800;    
+  --soko-cream: #f9fffb;   /* Soft mint-cream for better eye comfort */
+}
+
 html {
     scroll-behavior: smooth;
 }
 
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #fffdf5;
-    color: #111827;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--soko-cream);
+    color: #1a1a1a;
 }
 
-* {
-    box-sizing: border-box;
+.shadow-soft {
+  box-shadow: 0 10px 40px -10px rgba(0, 166, 81, 0.1);
+}
+
+/* Custom Scrollbar for the Category Bar */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
