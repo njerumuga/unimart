@@ -1,86 +1,96 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { db } from "../firebase";
-import { collection, getDocs } from "firebase/firestore";
-import ItemCard from "../components/ItemCard";
+import React from "react";
+import { Link } from "react-router-dom";
 
-export default function SellerProfile() {
-  const { sellerId } = useParams();
-  const [sellerItems, setSellerItems] = useState([]);
-  const [sellerName, setSellerName] = useState("");
-  const [loading, setLoading] = useState(true);
+export default function ItemCard({ item, isSellerView = false }) {
+  if (!item) return null;
 
-  useEffect(() => {
-    const fetchSellerListings = async () => {
-      try {
-        const itemsRef = collection(db, "items");
-        const querySnapshot = await getDocs(itemsRef);
+  const imageUrl = item?.imageUrl || "https://via.placeholder.com/600x400?text=No+Image";
+  const sellerId = item?.userId || item?.sellerId || item?.uid;
+  const sellerName = item?.userName || item?.sellerName || "SokoHub Seller";
+  const rawPhone = item?.sellerPhone || item?.phone || item?.whatsappNumber || "";
 
-        const items = [];
-        let name = "";
+  // Direct WhatsApp Launcher
+  const handleWhatsAppClick = (e) => {
+    e.stopPropagation();
 
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
+    if (!rawPhone) {
+      alert("Seller phone number unavailable");
+      return;
+    }
 
-          const isMatch =
-            data.userId === sellerId ||
-            data.sellerId === sellerId ||
-            data.uid === sellerId;
+    let cleanPhone = rawPhone.toString().replace(/\+/g, "").replace(/\s+/g, "").trim();
+    if (cleanPhone.startsWith("0")) {
+      cleanPhone = "254" + cleanPhone.substring(1);
+    }
 
-          if (isMatch) {
-            items.push({ id: doc.id, ...data });
-            if (!name) {
-              name = data.userName || data.sellerName || "Seller";
-            }
-          }
-        });
-
-        setSellerItems(items);
-        setSellerName(name || "Seller");
-      } catch (error) {
-        console.error("Error fetching seller listings:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSellerListings();
-  }, [sellerId]);
+    const message = `Hi ${sellerName}, I'm interested in buying your '${item?.title}' listed for KSh ${item?.price} on SokoHub.`;
+    const url = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank");
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24 pt-24 px-6 md:px-12">
-      <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
-        <div className="bg-white rounded-[32px] p-8 shadow-md border-2 border-[#00a651] mb-10 flex items-center justify-between">
-          <div>
-            <p className="text-[#00a651] font-black uppercase tracking-widest text-xs mb-1">
-              Seller Profile
+    <div className="group flex flex-col bg-white rounded-[32px] overflow-hidden transition-all duration-500 hover:shadow-2xl border-2 border-transparent hover:border-[#00a651] h-full shadow-soft">
+      
+      {/* Clickable Image -> Goes to Seller Profile */}
+      <Link to={`/seller/${sellerId}`} className="relative aspect-square m-2 overflow-hidden rounded-[24px] block">
+        <img
+          src={imageUrl}
+          alt={item?.title}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+        />
+        <div className="absolute top-4 right-4">
+          <div className="bg-[#00a651] text-[#ffb800] px-4 py-2 rounded-2xl shadow-lg">
+            <p className="font-black text-sm">
+              KSh {Number(item?.price || 0).toLocaleString()}
             </p>
-            <h1 className="text-3xl md:text-5xl font-black text-gray-900 uppercase italic">
-              {sellerName}'s <span className="text-[#00a651]">Listings</span>
-            </h1>
-          </div>
-          <div className="bg-[#ffb800] px-6 py-3 rounded-2xl font-black text-black text-sm uppercase shadow-md shrink-0">
-            {sellerItems.length} {sellerItems.length === 1 ? "Item" : "Items"}
           </div>
         </div>
+      </Link>
 
-        {/* Listings Grid */}
-        {loading ? (
-          <div className="text-center py-20 font-black text-[#00a651] text-lg uppercase tracking-widest animate-pulse">
-            Loading Comrade Listings...
-          </div>
-        ) : sellerItems.length === 0 ? (
-          <div className="bg-white rounded-[32px] p-12 text-center shadow-md border border-gray-100">
-            <h3 className="text-2xl font-bold text-gray-700 mb-2">No active listings found</h3>
-            <p className="text-gray-500 text-sm">This seller doesn't have any active items posted.</p>
-          </div>
+      {/* Content Section */}
+      <div className="flex flex-col flex-1 p-6 pt-2">
+        <div className="mb-6">
+          <p className="text-[10px] uppercase tracking-widest font-black text-[#00a651] mb-1">
+            {item?.category || "Listing"}
+          </p>
+          <h3 className="text-xl font-bold text-gray-900 line-clamp-1">
+            {item?.title}
+          </h3>
+        </div>
+
+        {/* Seller Info Header */}
+        <div className="flex items-center justify-between mb-8">
+          <Link 
+            to={`/seller/${sellerId}`} 
+            className="flex items-center gap-2 group/seller hover:opacity-80 transition-opacity"
+          >
+            <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center text-[8px] font-black text-[#00a651] group-hover/seller:bg-[#00a651] group-hover/seller:text-white transition-colors">
+              {sellerName.charAt(0).toUpperCase()}
+            </div>
+            <span className="text-xs font-bold text-gray-500 group-hover/seller:text-[#00a651] group-hover/seller:underline transition-colors">
+              {sellerName.split(' ')[0]}
+            </span>
+          </Link>
+
+          <span className="text-[10px] font-black uppercase text-[#00a651] tracking-tighter italic">
+            Verified ●
+          </span>
+        </div>
+
+        {/* Action Button: WhatsApp vs Seller Profile */}
+        {isSellerView ? (
+          <button 
+            onClick={handleWhatsAppClick}
+            className="w-full mt-auto bg-[#ffb800] text-black py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all hover:bg-[#00a651] hover:text-white shadow-md active:scale-95"
+          >
+            Chat on WhatsApp
+          </button>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {sellerItems.map((item) => (
-              <ItemCard key={item.id} item={item} isSellerView={true} />
-            ))}
-          </div>
+          <Link to={`/seller/${sellerId}`} className="mt-auto">
+            <button className="w-full bg-[#ffb800] text-black py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all hover:bg-[#00a651] hover:text-white shadow-md active:scale-95">
+              View Seller Listings
+            </button>
+          </Link>
         )}
       </div>
     </div>
