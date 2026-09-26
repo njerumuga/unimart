@@ -12,14 +12,12 @@ export default function Home() {
     const [showSecretBtn, setShowSecretBtn] = useState(false); 
     const { isAdmin } = useAuth();
 
-    // ✅ Hidden Admin Shortcut Logic
+    // ✅ Hidden Admin Shortcut
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.shiftKey && (e.key === "A" || e.key === "a")) {
                 if (isAdmin) {
                     setShowSecretBtn((prev) => !prev);
-                } else {
-                    console.warn("Shortcut pressed, but user is not an Admin.");
                 }
             }
         };
@@ -42,9 +40,25 @@ export default function Home() {
         return () => unsub();
     }, [isAdmin]);
 
-    const filteredItems = useMemo(() => {
-        if (selectedCategory === "All") return items;
-        return items.filter((item) => item.category === selectedCategory);
+    // ✅ Group by Seller UID to avoid duplicate seller entries on the homepage
+    const uniqueSellersList = useMemo(() => {
+        let filtered = items;
+        if (selectedCategory !== "All") {
+            filtered = items.filter((item) => item.category === selectedCategory);
+        }
+
+        const seenSellers = new Set();
+        const deduplicated = [];
+
+        for (const item of filtered) {
+            const sellerKey = item.userId || item.sellerId || item.uid;
+            if (sellerKey && !seenSellers.has(sellerKey)) {
+                seenSellers.add(sellerKey);
+                deduplicated.push(item);
+            }
+        }
+
+        return deduplicated;
     }, [items, selectedCategory]);
 
     return (
@@ -60,7 +74,7 @@ export default function Home() {
                 </Link>
             )}
 
-            {/* COMPACT HERO SECTION */}
+            {/* COMPACT HERO */}
             <header className="relative bg-[#00a651] pt-8 pb-16 px-4 border-b-[6px] border-[#ffb800]">
                 <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
                 <div className="relative max-w-5xl mx-auto text-center">
@@ -98,14 +112,14 @@ export default function Home() {
             <main className="max-w-7xl mx-auto px-6 md:px-12">
                 <div className="flex items-center gap-4 mb-8 px-2">
                     <h2 className="text-2xl font-black text-[#00a651] uppercase italic tracking-tighter">
-                       {selectedCategory === "All" ? "Fresh Drops" : selectedCategory}
+                       {selectedCategory === "All" ? "Featured Sellers" : selectedCategory}
                     </h2>
                     <div className="h-1 flex-1 bg-[#ffb800] rounded-full opacity-30"></div>
-                    <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">{filteredItems.length} items</p>
+                    <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">{uniqueSellersList.length} Sellers</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    {filteredItems.map((item) => (
+                    {uniqueSellersList.map((item) => (
                         <ItemCard key={item.id} item={item} />
                     ))}
                 </div>
