@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import AdminPage from "./pages/AdminPage"; // ✅ Import your admin page
+import SellerProfile from "./pages/SellerProfile"; // ✅ Import seller profile page
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Advertise from "./pages/Advertise";
 
@@ -26,6 +27,9 @@ function App() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/signup" element={<Signup />} />
                         <Route path="/profile" element={<Profile />} />
+
+                        {/* ✅ Seller Profile route */}
+                        <Route path="/seller/:sellerId" element={<SellerProfile />} />
 
                         {/* ✅ Admin-only route */}
                         <Route path="/admin" element={<AdminPage />} />
