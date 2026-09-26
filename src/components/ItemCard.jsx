@@ -22,7 +22,6 @@ export default function SellerProfile() {
         querySnapshot.forEach((doc) => {
           const data = doc.data();
 
-          // Match seller ID across all potential database field names
           const isMatch =
             data.userId === sellerId ||
             data.sellerId === sellerId ||
@@ -61,7 +60,7 @@ export default function SellerProfile() {
               {sellerName}'s <span className="text-[#00a651]">Listings</span>
             </h1>
           </div>
-          <div className="bg-[#ffb800] px-6 py-3 rounded-2xl font-black text-black text-sm uppercase shadow-md">
+          <div className="bg-[#ffb800] px-6 py-3 rounded-2xl font-black text-black text-sm uppercase shadow-md shrink-0">
             {sellerItems.length} {sellerItems.length === 1 ? "Item" : "Items"}
           </div>
         </div>
@@ -72,7 +71,7 @@ export default function SellerProfile() {
             Loading Comrade Listings...
           </div>
         ) : sellerItems.length === 0 ? (
-          <div className="bg-[#ffffff] rounded-[32px] p-12 text-center shadow-md border border-gray-100">
+          <div className="bg-white rounded-[32px] p-12 text-center shadow-md border border-gray-100">
             <h3 className="text-2xl font-bold text-gray-700 mb-2">No active listings found</h3>
             <p className="text-gray-500 text-sm">This seller doesn't have any active items posted.</p>
           </div>
