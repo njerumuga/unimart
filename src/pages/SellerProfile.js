@@ -22,7 +22,6 @@ export default function SellerProfile() {
         querySnapshot.forEach((doc) => {
           const data = doc.data();
 
-          // Match seller ID across all potential database field names
           const isMatch =
             data.userId === sellerId ||
             data.sellerId === sellerId ||
@@ -61,7 +60,7 @@ export default function SellerProfile() {
               {sellerName}'s <span className="text-[#00a651]">Listings</span>
             </h1>
           </div>
-          <div className="bg-[#ffb800] px-6 py-3 rounded-2xl font-black text-black text-sm uppercase shadow-md">
+          <div className="bg-[#ffb800] px-6 py-3 rounded-2xl font-black text-black text-sm uppercase shadow-md shrink-0">
             {sellerItems.length} {sellerItems.length === 1 ? "Item" : "Items"}
           </div>
         </div>
@@ -79,7 +78,7 @@ export default function SellerProfile() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {sellerItems.map((item) => (
-              <ItemCard key={item.id} item={item} />
+              <ItemCard key={item.id} item={item} isSellerView={true} />
             ))}
           </div>
         )}
