@@ -12,14 +12,10 @@ export default function Home() {
     const [showSecretBtn, setShowSecretBtn] = useState(false); 
     const { isAdmin } = useAuth();
 
-    // ✅ FIXED: Hidden Admin Shortcut Logic
+    // ✅ Hidden Admin Shortcut Logic
     useEffect(() => {
         const handleKeyDown = (e) => {
-            // This console.log helps you verify the keys are being pressed
-            // console.log("Key:", e.key, "Shift:", e.shiftKey);
-
             if (e.shiftKey && (e.key === "A" || e.key === "a")) {
-                // Only toggle if the user is actually an admin in the system
                 if (isAdmin) {
                     setShowSecretBtn((prev) => !prev);
                 } else {
@@ -30,7 +26,7 @@ export default function Home() {
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [isAdmin]); // ✅ Crucial: dependency ensures it knows your admin status
+    }, [isAdmin]);
 
     useEffect(() => {
         const q = query(
