@@ -1,12 +1,30 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default function ItemCard({ item }) {
+export default function ItemCard({ item, isSellerView = false }) {
     if (!item) return null;
 
     const imageUrl = item?.imageUrl || "https://via.placeholder.com/600x400?text=No+Image";
     const sellerId = item?.userId || item?.sellerId || item?.uid;
     const sellerName = item?.userName || item?.sellerName || "Seller";
+    const rawPhone = item?.sellerPhone || item?.phone || item?.whatsappNumber || "";
+
+    // WhatsApp Direct Action
+    const handleWhatsAppClick = () => {
+        if (!rawPhone) {
+            alert("Seller phone number unavailable");
+            return;
+        }
+
+        let cleanPhone = rawPhone.toString().replace(/\+/g, "").replace(/\s+/g, "").trim();
+        if (cleanPhone.startsWith("0")) {
+            cleanPhone = "254" + cleanPhone.substring(1);
+        }
+
+        const message = `Hi ${sellerName}, I'm interested in buying your '${item?.title}' listed for KSh ${item?.price} on SokoHub.`;
+        const url = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`;
+        window.open(url, "_blank");
+    };
 
     return (
         <div className="group flex flex-col bg-white rounded-[32px] overflow-hidden transition-all duration-500 hover:shadow-2xl border-2 border-transparent hover:border-[#00a651] h-full shadow-soft">
@@ -55,12 +73,21 @@ export default function ItemCard({ item }) {
                     <span className="text-[10px] font-black uppercase text-[#00a651] tracking-tighter italic">Verified ●</span>
                 </div>
 
-                {/* Button -> Routes to Seller Profile */}
-                <Link to={`/seller/${sellerId}`} className="mt-auto">
-                    <button className="w-full bg-[#ffb800] text-black py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all hover:bg-[#00a651] hover:text-white shadow-md active:scale-95">
-                        View Seller Listings
+                {/* Conditional Action Button */}
+                {isSellerView ? (
+                    <button 
+                        onClick={handleWhatsAppClick}
+                        className="w-full mt-auto bg-[#ffb800] text-black py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all hover:bg-[#00a651] hover:text-white shadow-md active:scale-95"
+                    >
+                        Chat on WhatsApp
                     </button>
-                </Link>
+                ) : (
+                    <Link to={`/seller/${sellerId}`} className="mt-auto">
+                        <button className="w-full bg-[#ffb800] text-black py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all hover:bg-[#00a651] hover:text-white shadow-md active:scale-95">
+                            View Seller Listings
+                        </button>
+                    </Link>
+                )}
             </div>
         </div>
     );
