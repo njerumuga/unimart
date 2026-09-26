@@ -1,29 +1,18 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 export default function ItemCard({ item }) {
-    const { user } = useAuth();
-    const navigate = useNavigate();
-
     if (!item) return null;
 
     const imageUrl = item?.imageUrl || "https://via.placeholder.com/600x400?text=No+Image";
-    const sellerId = item?.userId || item?.sellerId;
+    const sellerId = item?.userId || item?.sellerId || item?.uid;
     const sellerName = item?.userName || item?.sellerName || "Seller";
-
-    const handleViewDetails = (e) => {
-        if (!user) {
-            e.preventDefault(); 
-            alert("Comrade, you need to Login first to see full details! 🤝");
-            navigate("/login");
-        }
-    };
 
     return (
         <div className="group flex flex-col bg-white rounded-[32px] overflow-hidden transition-all duration-500 hover:shadow-2xl border-2 border-transparent hover:border-[#00a651] h-full shadow-soft">
-            {/* Image Section */}
-            <div className="relative aspect-square m-2 overflow-hidden rounded-[24px]">
+            
+            {/* Clickable Image -> Goes to Seller Profile */}
+            <Link to={`/seller/${sellerId}`} className="relative aspect-square m-2 overflow-hidden rounded-[24px] block">
                 <img
                     src={imageUrl}
                     alt={item?.title}
@@ -36,7 +25,7 @@ export default function ItemCard({ item }) {
                         </p>
                     </div>
                 </div>
-            </div>
+            </Link>
 
             {/* Content Section */}
             <div className="flex flex-col flex-1 p-6 pt-2">
@@ -49,37 +38,27 @@ export default function ItemCard({ item }) {
                     </h3>
                 </div>
 
-                {/* Seller Profile Link Section */}
+                {/* Seller Profile Link */}
                 <div className="flex items-center justify-between mb-8">
-                    {sellerId ? (
-                        <Link 
-                            to={`/seller/${sellerId}`} 
-                            className="flex items-center gap-2 group/seller hover:opacity-80 transition-opacity z-10"
-                            onClick={(e) => e.stopPropagation()} // Prevents parent click conflicts
-                        >
-                            <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center text-[8px] font-black text-[#00a651] group-hover/seller:bg-[#00a651] group-hover/seller:text-white transition-colors">
-                                {sellerName.charAt(0).toUpperCase()}
-                            </div>
-                            <span className="text-xs font-bold text-gray-500 group-hover/seller:text-[#00a651] group-hover/seller:underline transition-colors">
-                                {sellerName.split(' ')[0]}
-                            </span>
-                        </Link>
-                    ) : (
-                        <div className="flex items-center gap-2">
-                            <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center text-[8px] font-black text-[#00a651]">
-                                {sellerName.charAt(0).toUpperCase()}
-                            </div>
-                            <span className="text-xs font-bold text-gray-500">{sellerName.split(' ')[0]}</span>
+                    <Link 
+                        to={`/seller/${sellerId}`} 
+                        className="flex items-center gap-2 group/seller hover:opacity-80 transition-opacity"
+                    >
+                        <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center text-[8px] font-black text-[#00a651] group-hover/seller:bg-[#00a651] group-hover/seller:text-white transition-colors">
+                            {sellerName.charAt(0).toUpperCase()}
                         </div>
-                    )}
+                        <span className="text-xs font-bold text-gray-500 group-hover/seller:text-[#00a651] group-hover/seller:underline transition-colors">
+                            {sellerName.split(' ')[0]}
+                        </span>
+                    </Link>
 
                     <span className="text-[10px] font-black uppercase text-[#00a651] tracking-tighter italic">Verified ●</span>
                 </div>
 
-                {/* View Details Button */}
-                <Link to={`/item/${item?.id}`} onClick={handleViewDetails} className="mt-auto">
+                {/* Button -> Routes to Seller Profile */}
+                <Link to={`/seller/${sellerId}`} className="mt-auto">
                     <button className="w-full bg-[#ffb800] text-black py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all hover:bg-[#00a651] hover:text-white shadow-md active:scale-95">
-                        View Details
+                        View Seller Listings
                     </button>
                 </Link>
             </div>
