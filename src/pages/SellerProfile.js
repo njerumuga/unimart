@@ -27,7 +27,8 @@ export default function SellerProfile() {
             data.sellerId === sellerId ||
             data.uid === sellerId;
 
-          if (isMatch) {
+          // Strict guard: Must match seller AND be approved by admin
+          if (isMatch && data.isApproved === true) {
             items.push({ id: doc.id, ...data });
             if (!name) {
               name = data.userName || data.sellerName || "Seller";
@@ -73,7 +74,7 @@ export default function SellerProfile() {
         ) : sellerItems.length === 0 ? (
           <div className="bg-white rounded-[32px] p-12 text-center shadow-md border border-gray-100">
             <h3 className="text-2xl font-bold text-gray-700 mb-2">No active listings found</h3>
-            <p className="text-gray-500 text-sm">This seller doesn't have any active items posted.</p>
+            <p className="text-gray-500 text-sm">This seller doesn't have any active approved items posted.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
