@@ -5,6 +5,7 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { uploadToCloudinary } from "../cloudinary";
 import { categories } from "../data/categories";
+import { locations } from "../data/locations";
 
 export default function PostItem() {
     const { user } = useAuth();
@@ -15,6 +16,8 @@ export default function PostItem() {
         price: "",
         description: "",
         category: "",
+        locationZone: "",
+        condition: "Used - Good",
         sellerPhone: "",
         requestFeatured: false,
     });
@@ -54,6 +57,8 @@ export default function PostItem() {
                 price: Number(form.price),
                 description: form.description,
                 category: form.category,
+                locationZone: form.locationZone || "Main Gate",
+                condition: form.condition,
                 imageUrl,
                 sellerPhone: form.sellerPhone,
                 userId: user.uid,
@@ -92,19 +97,65 @@ export default function PostItem() {
                         className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-soko-yellow"
                     />
 
-                    <input
-                        name="price"
-                        type="number"
-                        placeholder="Price (e.g. 15000)"
-                        value={form.price}
-                        onChange={(e) => setForm({ ...form, price: e.target.value })}
-                        required
-                        className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-soko-yellow"
-                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input
+                            name="price"
+                            type="number"
+                            placeholder="Price (e.g. 15000)"
+                            value={form.price}
+                            onChange={(e) => setForm({ ...form, price: e.target.value })}
+                            required
+                            className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-soko-yellow"
+                        />
+
+                        <select
+                            name="condition"
+                            value={form.condition}
+                            onChange={(e) => setForm({ ...form, condition: e.target.value })}
+                            className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-soko-yellow"
+                        >
+                            <option value="Brand New">Brand New</option>
+                            <option value="Like New">Used - Like New</option>
+                            <option value="Used - Good">Used - Good</option>
+                            <option value="Refurbished">Refurbished</option>
+                        </select>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <select
+                            name="category"
+                            value={form.category}
+                            onChange={(e) => setForm({ ...form, category: e.target.value })}
+                            required
+                            className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-soko-yellow"
+                        >
+                            <option value="">Select Category</option>
+                            {categories.map((cat) => (
+                                <option key={cat} value={cat}>
+                                    {cat}
+                                </option>
+                            ))}
+                        </select>
+
+                        <select
+                            name="locationZone"
+                            value={form.locationZone}
+                            onChange={(e) => setForm({ ...form, locationZone: e.target.value })}
+                            required
+                            className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-soko-yellow"
+                        >
+                            <option value="">Select Location/Area</option>
+                            {locations.map((loc) => (
+                                <option key={loc} value={loc}>
+                                    {loc}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
                     <input
                         name="sellerPhone"
-                        placeholder="WhatsApp number (e.g. 2547XXXXXXXX)"
+                        placeholder="WhatsApp number (e.g. 07XXXXXXXX or 2547XXXXXXXX)"
                         value={form.sellerPhone}
                         onChange={(e) => setForm({ ...form, sellerPhone: e.target.value })}
                         required
@@ -136,24 +187,9 @@ export default function PostItem() {
                         value={form.description}
                         onChange={(e) => setForm({ ...form, description: e.target.value })}
                         required
-                        rows="5"
+                        rows="4"
                         className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-soko-yellow"
                     />
-
-                    <select
-                        name="category"
-                        value={form.category}
-                        onChange={(e) => setForm({ ...form, category: e.target.value })}
-                        required
-                        className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-soko-yellow"
-                    >
-                        <option value="">Select category</option>
-                        {categories.map((category) => (
-                            <option key={category} value={category}>
-                                {category}
-                            </option>
-                        ))}
-                    </select>
 
                     <label className="flex items-center gap-3 text-sm font-medium text-soko-dark">
                         <input
