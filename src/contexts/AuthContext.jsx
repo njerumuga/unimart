@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
 
-    // See if any users exist (to assign first user as admin)
+    // Check if any users exist (to assign first user as admin)
     const checkIfFirstUser = async () => {
         try {
             const q = query(collection(db, "users"), limit(1));
@@ -54,7 +54,7 @@ export function AuthProvider({ children }) {
     const login = (email, password) =>
         signInWithEmailAndPassword(auth, email, password);
 
-    // 🔹 Google Sign-In (Redirect based - solves COOP popup blocking)
+    // 🔹 Google Sign-In via Redirect (Fixes COOP popup blocking)
     const googleSignIn = async () => {
         const provider = new GoogleAuthProvider();
         await signInWithRedirect(auth, provider);
@@ -63,9 +63,9 @@ export function AuthProvider({ children }) {
     // 🔹 Logout
     const logout = () => signOut(auth);
 
-    // 🔹 Watch for auth changes & handle redirect results
+    // 🔹 Watch auth changes & process Google redirect results
     useEffect(() => {
-        // Handle Google Redirect login return
+        // Handle post-redirect return from Google authentication
         getRedirectResult(auth)
             .then(async (res) => {
                 if (res?.user) {
@@ -84,7 +84,7 @@ export function AuthProvider({ children }) {
                 }
             })
             .catch((error) => {
-                console.error("Error handling Google redirect result:", error);
+                console.error("Error processing Google redirect result:", error);
             });
 
         const unsub = onAuthStateChanged(auth, async (u) => {
@@ -104,7 +104,7 @@ export function AuthProvider({ children }) {
 
                     userIsAdmin = userData.isAdmin === true || adminSnap.exists();
                 } catch (error) {
-                    console.warn("Firestore fetch error, utilizing auth profile fallback:", error);
+                    console.warn("Firestore access error, falling back to basic Auth user profile:", error);
                 }
 
                 setUser({
