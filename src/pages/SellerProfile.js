@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
@@ -10,7 +10,6 @@ export default function SellerProfile() {
   const { sellerId } = useParams();
   const [sellerItems, setSellerItems] = useState([]);
   const [sellerName, setSellerName] = useState("");
-  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -51,11 +50,19 @@ export default function SellerProfile() {
         <p>Loading seller profile...</p>
       ) : (
         <div>
-          <h1 className="text-2xl font-bold mb-4">
-            {sellerName || "Seller Profile"}
-          </h1>
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl font-bold">
+              {sellerName || "Seller Profile"}
+            </h1>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="rounded bg-soko-green px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600"
+            >
+              Rate Seller
+            </button>
+          </div>
           <TrustBadge />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+          <div className="grid grid-cols-1 gap-4 mt-6 md:grid-cols-3">
             {sellerItems.map((item) => (
               <ItemCard key={item.id} item={item} />
             ))}
