@@ -5,14 +5,15 @@ import { db } from "../firebase";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
 import { categories } from "../data/categories";
+import { locations } from "../data/locations";
 
 export default function Home() {
     const [items, setItems] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("All");
+    const [selectedLocation, setSelectedLocation] = useState("All");
     const [showSecretBtn, setShowSecretBtn] = useState(false); 
     const { isAdmin } = useAuth();
 
-    // ✅ Hidden Admin Shortcut
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.shiftKey && (e.key === "A" || e.key === "a")) {
@@ -40,11 +41,15 @@ export default function Home() {
         return () => unsub();
     }, [isAdmin]);
 
-    // ✅ Group by Seller UID to avoid duplicate seller entries on the homepage
     const uniqueSellersList = useMemo(() => {
         let filtered = items;
+        
         if (selectedCategory !== "All") {
-            filtered = items.filter((item) => item.category === selectedCategory);
+            filtered = filtered.filter((item) => item.category === selectedCategory);
+        }
+
+        if (selectedLocation !== "All") {
+            filtered = filtered.filter((item) => item.locationZone === selectedLocation);
         }
 
         const seenSellers = new Set();
@@ -59,12 +64,10 @@ export default function Home() {
         }
 
         return deduplicated;
-    }, [items, selectedCategory]);
+    }, [items, selectedCategory, selectedLocation]);
 
     return (
         <div className="min-h-screen pb-24 relative">
-            
-            {/* ✅ SECRET ADMIN BUTTON */}
             {showSecretBtn && isAdmin && (
                 <Link 
                     to="/admin" 
@@ -74,37 +77,53 @@ export default function Home() {
                 </Link>
             )}
 
-            {/* COMPACT HERO */}
+            {/* HERO */}
             <header className="relative bg-[#00a651] pt-8 pb-16 px-4 border-b-[6px] border-[#ffb800]">
                 <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
                 <div className="relative max-w-5xl mx-auto text-center">
                     <h1 className="text-3xl md:text-5xl font-black text-white tracking-tighter mb-2 uppercase italic leading-none">
-                        The Comrade <span className="text-[#ffb800]">Market.</span>
+                        The Meru <span className="text-[#ffb800]">Marketplace.</span>
                     </h1>
                     <p className="max-w-xl mx-auto text-xs md:text-sm text-green-50 font-medium">
-                        Buy, sell, and trade second-hand items within your campus community. Safe. Local. Transparent.
+                        Buy, sell, and trade electronics, household goods, and services across Meru & Campus. Safe. Local. Verified.
                     </p>
                 </div>
             </header>
 
-            {/* CATEGORY BAR */}
-            <div className="sticky top-[72px] z-40 -mt-6 mb-10">
-                <div className="max-w-6xl mx-auto px-4">
-                    <div className="bg-white border-2 border-[#00a651] rounded-[24px] p-2 shadow-lg flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth">
-                        {["All", ...categories].map((c) => (
-                            <button
-                                key={c}
-                                onClick={() => setSelectedCategory(c)}
-                                className={`whitespace-nowrap rounded-[18px] px-6 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all ${
-                                    selectedCategory === c
-                                        ? "bg-[#00a651] text-white shadow-md scale-105"
-                                        : "text-gray-400 hover:text-[#00a651] hover:bg-green-50"
-                                }`}
-                            >
-                                {c}
-                            </button>
+            {/* FILTERS SECTION */}
+            <div className="sticky top-[72px] z-40 -mt-6 mb-10 max-w-6xl mx-auto px-4 space-y-3">
+                {/* Category Bar */}
+                <div className="bg-white border-2 border-[#00a651] rounded-[24px] p-2 shadow-lg flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth">
+                    {["All", ...categories].map((c) => (
+                        <button
+                            key={c}
+                            onClick={() => setSelectedCategory(c)}
+                            className={`whitespace-nowrap rounded-[18px] px-6 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all ${
+                                selectedCategory === c
+                                    ? "bg-[#00a651] text-white shadow-md scale-105"
+                                    : "text-gray-400 hover:text-[#00a651] hover:bg-green-50"
+                            }`}
+                        >
+                            {c}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Location Filter Dropdown Bar */}
+                <div className="flex items-center justify-end gap-2 px-2">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Area:</span>
+                    <select
+                        value={selectedLocation}
+                        onChange={(e) => setSelectedLocation(e.target.value)}
+                        className="rounded-xl border border-gray-200 bg-white px-4 py-1.5 text-xs font-bold text-gray-700 outline-none focus:border-[#00a651]"
+                    >
+                        <option value="All">All Locations</option>
+                        {locations.map((loc) => (
+                            <option key={loc} value={loc}>
+                                {loc}
+                            </option>
                         ))}
-                    </div>
+                    </select>
                 </div>
             </div>
 
