@@ -18,11 +18,16 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
 
-    // ✅ Improved Check: See if any users exist (to assign first admin)
+    // ✅ See if any users exist (to assign first user as admin)
     const checkIfFirstUser = async () => {
-        const q = query(collection(db, "users"), limit(1));
-        const snapshot = await getDocs(q);
-        return snapshot.empty;
+        try {
+            const q = query(collection(db, "users"), limit(1));
+            const snapshot = await getDocs(q);
+            return snapshot.empty;
+        } catch (error) {
+            console.error("Error checking first user status:", error);
+            return false;
+        }
     };
 
     // 🔹 Signup
@@ -30,12 +35,16 @@ export function AuthProvider({ children }) {
         const res = await createUserWithEmailAndPassword(auth, email, password);
         const isFirst = await checkIfFirstUser();
 
-        await setDoc(doc(db, "users", res.user.uid), {
-            displayName,
-            email,
-            isAdmin: isFirst,
-            createdAt: new Date(),
-        });
+        try {
+            await setDoc(doc(db, "users", res.user.uid), {
+                displayName,
+                email,
+                isAdmin: isFirst,
+                createdAt: new Date(),
+            });
+        } catch (error) {
+            console.error("Error creating user doc on signup:", error);
+        }
 
         return res;
     };
@@ -49,39 +58,53 @@ export function AuthProvider({ children }) {
         const provider = new GoogleAuthProvider();
         const res = await signInWithPopup(auth, provider);
 
-        const udoc = doc(db, "users", res.user.uid);
-        const snap = await getDoc(udoc);
+        try {
+            const udoc = doc(db, "users", res.user.uid);
+            const snap = await getDoc(udoc);
 
-        if (!snap.exists()) {
-            const isFirst = await checkIfFirstUser();
-            await setDoc(udoc, {
-                displayName: res.user.displayName || "",
-                email: res.user.email,
-                isAdmin: isFirst,
-                createdAt: new Date(),
-            });
+            if (!snap.exists()) {
+                const isFirst = await checkIfFirstUser();
+                await setDoc(udoc, {
+                    displayName: res.user.displayName || "",
+                    email: res.user.email,
+                    isAdmin: isFirst,
+                    createdAt: new Date(),
+                });
+            }
+        } catch (error) {
+            console.error("Error handling Google user doc:", error);
         }
+
         return res;
     };
 
     // 🔹 Logout
     const logout = () => signOut(auth);
 
-    // 🔹 Watch for login changes
+    // 🔹 Watch for auth changes
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, async (u) => {
             if (u) {
-                // 1. Fetch user data from 'users' collection
-                const udoc = doc(db, "users", u.uid);
-                const snapshot = await getDoc(udoc);
-                const userData = snapshot.exists() ? snapshot.data() : {};
+                let userData = {};
+                let userIsAdmin = false;
 
-                // 2. Double Check: Check if UID exists in a separate 'admins' collection
-                const adminRef = doc(db, "admins", u.uid);
-                const adminSnap = await getDoc(adminRef);
-                
-                // ✅ Final Admin Logic: True if field is true OR if they exist in admin collection
-                const userIsAdmin = userData.isAdmin === true || adminSnap.exists();
+                try {
+                    // 1. Fetch user data from 'users' collection
+                    const udoc = doc(db, "users", u.uid);
+                    const snapshot = await getDoc(udoc);
+                    if (snapshot.exists()) {
+                        userData = snapshot.data();
+                    }
+
+                    // 2. Double Check: Check if UID exists in separate 'admins' collection
+                    const adminRef = doc(db, "admins", u.uid);
+                    const adminSnap = await getDoc(adminRef);
+
+                    // Final Admin Logic: True if field is true OR if present in admins collection
+                    userIsAdmin = userData.isAdmin === true || adminSnap.exists();
+                } catch (error) {
+                    console.error("Error fetching user/admin metadata on auth change:", error);
+                }
 
                 setUser({
                     uid: u.uid,
