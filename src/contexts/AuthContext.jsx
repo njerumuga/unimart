@@ -100,7 +100,7 @@ export function AuthProvider({ children }) {
 
                     userIsAdmin = userData.isAdmin === true || adminSnap.exists();
                 } catch (error) {
-                    console.error("Error fetching user/admin metadata on auth change:", error);
+                    console.warn("Firestore fetch error, utilizing auth profile fallback:", error);
                 }
 
                 setUser({
