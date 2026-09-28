@@ -6,7 +6,8 @@ import {
     signOut,
     onAuthStateChanged,
     GoogleAuthProvider,
-    signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult,
 } from "firebase/auth";
 import { doc, setDoc, getDoc, collection, getDocs, query, limit } from "firebase/firestore";
 
@@ -53,36 +54,39 @@ export function AuthProvider({ children }) {
     const login = (email, password) =>
         signInWithEmailAndPassword(auth, email, password);
 
-    // 🔹 Google Sign-In
+    // 🔹 Google Sign-In (Redirect based - solves COOP popup blocking)
     const googleSignIn = async () => {
         const provider = new GoogleAuthProvider();
-        const res = await signInWithPopup(auth, provider);
-
-        try {
-            const udoc = doc(db, "users", res.user.uid);
-            const snap = await getDoc(udoc);
-
-            if (!snap.exists()) {
-                const isFirst = await checkIfFirstUser();
-                await setDoc(udoc, {
-                    displayName: res.user.displayName || "",
-                    email: res.user.email,
-                    isAdmin: isFirst,
-                    createdAt: new Date(),
-                });
-            }
-        } catch (error) {
-            console.error("Error handling Google user doc:", error);
-        }
-
-        return res;
+        await signInWithRedirect(auth, provider);
     };
 
     // 🔹 Logout
     const logout = () => signOut(auth);
 
-    // 🔹 Watch for auth changes
+    // 🔹 Watch for auth changes & handle redirect results
     useEffect(() => {
+        // Handle Google Redirect login return
+        getRedirectResult(auth)
+            .then(async (res) => {
+                if (res?.user) {
+                    const udoc = doc(db, "users", res.user.uid);
+                    const snap = await getDoc(udoc);
+
+                    if (!snap.exists()) {
+                        const isFirst = await checkIfFirstUser();
+                        await setDoc(udoc, {
+                            displayName: res.user.displayName || "",
+                            email: res.user.email,
+                            isAdmin: isFirst,
+                            createdAt: new Date(),
+                        });
+                    }
+                }
+            })
+            .catch((error) => {
+                console.error("Error handling Google redirect result:", error);
+            });
+
         const unsub = onAuthStateChanged(auth, async (u) => {
             if (u) {
                 let userData = {};
