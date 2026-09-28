@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "../firebase";
 import {
     createUserWithEmailAndPassword,
@@ -18,7 +18,7 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
 
-    // ✅ See if any users exist (to assign first user as admin)
+    // See if any users exist (to assign first user as admin)
     const checkIfFirstUser = async () => {
         try {
             const q = query(collection(db, "users"), limit(1));
@@ -89,18 +89,15 @@ export function AuthProvider({ children }) {
                 let userIsAdmin = false;
 
                 try {
-                    // 1. Fetch user data from 'users' collection
                     const udoc = doc(db, "users", u.uid);
                     const snapshot = await getDoc(udoc);
                     if (snapshot.exists()) {
                         userData = snapshot.data();
                     }
 
-                    // 2. Double Check: Check if UID exists in separate 'admins' collection
                     const adminRef = doc(db, "admins", u.uid);
                     const adminSnap = await getDoc(adminRef);
 
-                    // Final Admin Logic: True if field is true OR if present in admins collection
                     userIsAdmin = userData.isAdmin === true || adminSnap.exists();
                 } catch (error) {
                     console.error("Error fetching user/admin metadata on auth change:", error);
@@ -111,7 +108,7 @@ export function AuthProvider({ children }) {
                     email: u.email,
                     displayName: userData.displayName || u.displayName || "Comrade",
                     ...userData,
-                    isAdmin: userIsAdmin
+                    isAdmin: userIsAdmin,
                 });
 
                 setIsAdmin(userIsAdmin);
@@ -136,9 +133,10 @@ export function AuthProvider({ children }) {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading ? children : (
+            {!loading ? (
+                children
+            ) : (
                 <div className="flex h-screen items-center justify-center bg-soko-cream">
-                    {/* MUST-themed Loading Spinner */}
                     <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#ffb800] border-t-[#00a651]"></div>
                 </div>
             )}
