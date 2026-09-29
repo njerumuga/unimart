@@ -15,6 +15,13 @@ function Navbar() {
         }
     };
 
+    // Helper to resolve user's display name cleanly
+    const getFirstName = () => {
+        if (!user) return "Profile";
+        const fullName = user.displayName || user.name || user.username || user.email?.split("@")[0];
+        return fullName ? fullName.split(" ")[0] : "Profile";
+    };
+
     return (
         <nav className="sticky top-0 z-50 bg-[#00a651] text-white shadow-lg border-b-4 border-[#ffb800]">
             <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
@@ -58,7 +65,7 @@ function Navbar() {
                     {user ? (
                         <div className="flex items-center gap-3 md:gap-4">
                             <Link to="/profile" className="text-[10px] font-black text-[#ffb800] md:text-sm">
-                                {user.displayName?.split(' ')[0] || "Profile"}
+                                {getFirstName()}
                             </Link>
                             <button 
                                 onClick={handleLogout} 
