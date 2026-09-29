@@ -9,6 +9,7 @@ import {
   signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
+  updateProfile,
 } from "firebase/auth";
 import { doc, setDoc, getDoc, collection, getDocs, query, limit } from "firebase/firestore";
 
@@ -36,6 +37,15 @@ export function AuthProvider({ children }) {
   const signup = async (email, password, displayName = "") => {
     const res = await createUserWithEmailAndPassword(auth, email, password);
     const isFirst = await checkIfFirstUser();
+
+    // Update native Firebase Auth user profile displayName
+    if (displayName && res.user) {
+      try {
+        await updateProfile(res.user, { displayName });
+      } catch (err) {
+        console.error("Error updating native profile displayName:", err);
+      }
+    }
 
     try {
       await setDoc(doc(db, "users", res.user.uid), {
@@ -146,12 +156,18 @@ export function AuthProvider({ children }) {
           }
 
           if (isSubscribed) {
+            const nameToDisplay =
+              userData.displayName ||
+              userData.name ||
+              u.displayName ||
+              u.email?.split("@")[0] ||
+              "Comrade";
+
             setUser({
               uid: u.uid,
               email: u.email,
-              displayName:
-                userData.displayName || u.displayName || "Comrade",
               ...userData,
+              displayName: nameToDisplay,
               isAdmin: userIsAdmin,
             });
             setIsAdmin(userIsAdmin);
