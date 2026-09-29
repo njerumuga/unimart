@@ -197,12 +197,12 @@ export default function SellerProfile() {
           <h2 className="mb-4 text-xl font-bold text-gray-800">Items Listed by Seller</h2>
           {sellerItems.length === 0 ? (
             <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center">
-              <p className="text-gray-500 font-medium">This seller currently has no active listings.</p>
+              <p className="font-medium text-gray-500">This seller currently has no active listings.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               {sellerItems.map((item) => (
-                <ItemCard key={item.id} item={item} />
+                <ItemCard key={item.id} item={item} isSellerView={true} />
               ))}
             </div>
           )}
