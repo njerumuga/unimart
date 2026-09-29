@@ -19,7 +19,7 @@ export default function SellerProfile() {
   useEffect(() => {
     if (!sellerId) return;
 
-    // 1. Fetch Seller's Items
+    // 1. Fetch Seller's Items (Primary: sellerId, Fallback: userId)
     const itemsQuery = query(
       collection(db, "items"),
       where("sellerId", "==", sellerId)
@@ -28,15 +28,47 @@ export default function SellerProfile() {
     const unsubscribeItems = onSnapshot(
       itemsQuery,
       (snapshot) => {
-        const items = snapshot.docs.map((doc) => ({
+        let items = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setSellerItems(items);
-        if (items.length > 0 && items[0].sellerName) {
-          setSellerName(items[0].sellerName);
+
+        if (items.length === 0) {
+          // Fallback query in case items store owner reference under userId
+          const fallbackQuery = query(
+            collection(db, "items"),
+            where("userId", "==", sellerId)
+          );
+
+          onSnapshot(
+            fallbackQuery,
+            (fallbackSnap) => {
+              const fallbackItems = fallbackSnap.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }));
+              setSellerItems(fallbackItems);
+              if (fallbackItems.length > 0) {
+                setSellerName(
+                  fallbackItems[0].sellerName ||
+                    fallbackItems[0].userName ||
+                    ""
+                );
+              }
+              setLoading(false);
+            },
+            (err) => {
+              console.error("Error fetching fallback items:", err);
+              setLoading(false);
+            }
+          );
+        } else {
+          setSellerItems(items);
+          if (items[0]?.sellerName) {
+            setSellerName(items[0].sellerName);
+          }
+          setLoading(false);
         }
-        setLoading(false);
       },
       (error) => {
         console.error("Error fetching seller items:", error);
@@ -163,11 +195,17 @@ export default function SellerProfile() {
 
           {/* Seller Items Grid */}
           <h2 className="mb-4 text-xl font-bold text-gray-800">Items Listed by Seller</h2>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            {sellerItems.map((item) => (
-              <ItemCard key={item.id} item={item} />
-            ))}
-          </div>
+          {sellerItems.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center">
+              <p className="text-gray-500 font-medium">This seller currently has no active listings.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              {sellerItems.map((item) => (
+                <ItemCard key={item.id} item={item} />
+              ))}
+            </div>
+          )}
 
           {/* Rating Modal */}
           {isModalOpen && (
