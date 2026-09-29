@@ -70,6 +70,10 @@ export default function SellerProfile() {
     };
   }, [sellerId]);
 
+  // Check self-rating or prior review submission
+  const isOwnProfile = user && user.uid === sellerId;
+  const hasUserReviewed = user && reviews.some((r) => r.reviewerId === user.uid);
+
   // Calculate average rating
   const avgRating =
     reviews.length > 0
@@ -101,18 +105,32 @@ export default function SellerProfile() {
                 </div>
               </div>
 
-              <button
-                onClick={() => {
-                  if (!user) {
-                    alert("Please log in to leave a review.");
-                    return;
-                  }
-                  setIsModalOpen(true);
-                }}
-                className="rounded-lg bg-soko-green px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"
-              >
-                ★ Rate & Review Seller
-              </button>
+              {/* Prevent self-review and multiple reviews */}
+              {!isOwnProfile && (
+                <div>
+                  {hasUserReviewed ? (
+                    <button
+                      disabled
+                      className="cursor-not-allowed rounded-lg bg-gray-100 px-5 py-2.5 text-sm font-semibold text-gray-400"
+                    >
+                      ✓ Review Submitted
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        if (!user) {
+                          alert("Please log in to leave a review.");
+                          return;
+                        }
+                        setIsModalOpen(true);
+                      }}
+                      className="rounded-lg bg-soko-green px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600"
+                    >
+                      ★ Rate & Review Seller
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Display Customer Reviews */}
@@ -123,9 +141,16 @@ export default function SellerProfile() {
                   {reviews.map((rev) => (
                     <div key={rev.id} className="rounded-lg bg-gray-50 p-3 text-sm">
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-gray-800">
-                          {rev.reviewerName || "Verified Buyer"}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-gray-800">
+                            {rev.reviewerName || "Verified Buyer"}
+                          </span>
+                          {rev.itemTitle && (
+                            <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">
+                              Item: {rev.itemTitle}
+                            </span>
+                          )}
+                        </div>
                         <span className="text-amber-500">{"★".repeat(rev.rating || 5)}</span>
                       </div>
                       {rev.comment && <p className="mt-1 text-gray-600">{rev.comment}</p>}
@@ -150,6 +175,8 @@ export default function SellerProfile() {
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
               sellerId={sellerId}
+              sellerName={sellerName}
+              sellerItems={sellerItems}
             />
           )}
         </div>
