@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import { sendPasswordResetEmail } from "firebase/auth";
+import { fetchSignInMethodsForEmail, sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../firebase";
 
 export default function Login() {
@@ -23,7 +23,11 @@ export default function Login() {
       nav("/");
     } catch (err) {
       console.error("Firebase Login Error:", err);
-      if (err.code === "auth/invalid-credential" || err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
+      if (
+        err.code === "auth/invalid-credential" ||
+        err.code === "auth/user-not-found" ||
+        err.code === "auth/wrong-password"
+      ) {
         setError("Invalid email or password.");
       } else {
         setError(err.message || "Failed to log in. Please try again.");
@@ -59,8 +63,21 @@ export default function Login() {
     }
 
     try {
-      await sendPasswordResetEmail(auth, form.email);
-      setResetMessage("Password reset email sent. Check your inbox.");
+      // 1. Check if the account uses Google Sign-In only
+      const methods = await fetchSignInMethodsForEmail(auth, form.email);
+      if (methods.includes("google.com") && !methods.includes("password")) {
+        setError("This account uses Google Sign-In. Click 'Continue with Google' to log in.");
+        return;
+      }
+
+      // 2. Explicit actionCodeSettings redirecting to your domain
+      const actionCodeSettings = {
+        url: "https://www.sokohubonline.co.ke/login",
+        handleCodeInApp: true,
+      };
+
+      await sendPasswordResetEmail(auth, form.email, actionCodeSettings);
+      setResetMessage("Password reset email sent! Check your inbox and Spam folder.");
     } catch (err) {
       console.error("Reset Email Error:", err);
       setError(err.message || "Failed to send reset email.");
