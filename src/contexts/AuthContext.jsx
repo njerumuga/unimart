@@ -1,13 +1,14 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "../firebase";
 import {
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged,
-    GoogleAuthProvider,
-    signInWithRedirect,
-    getRedirectResult,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
 } from "firebase/auth";
 import { doc, setDoc, getDoc, collection, getDocs, query, limit } from "firebase/firestore";
 
@@ -15,135 +16,190 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [isAdmin, setIsAdmin] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-    // Check if any users exist (to assign first user as admin)
-    const checkIfFirstUser = async () => {
-        try {
-            const q = query(collection(db, "users"), limit(1));
-            const snapshot = await getDocs(q);
-            return snapshot.empty;
-        } catch (error) {
-            console.error("Error checking first user status:", error);
-            return false;
+  // Check if any users exist (to assign first user as admin)
+  const checkIfFirstUser = async () => {
+    try {
+      const q = query(collection(db, "users"), limit(1));
+      const snapshot = await getDocs(q);
+      return snapshot.empty;
+    } catch (error) {
+      console.error("Error checking first user status:", error);
+      return false;
+    }
+  };
+
+  // 🔹 Signup
+  const signup = async (email, password, displayName = "") => {
+    const res = await createUserWithEmailAndPassword(auth, email, password);
+    const isFirst = await checkIfFirstUser();
+
+    try {
+      await setDoc(doc(db, "users", res.user.uid), {
+        displayName,
+        email,
+        isAdmin: isFirst,
+        createdAt: new Date(),
+      });
+    } catch (error) {
+      console.error("Error creating user doc on signup:", error);
+    }
+
+    return res;
+  };
+
+  // 🔹 Login
+  const login = (email, password) =>
+    signInWithEmailAndPassword(auth, email, password);
+
+  // 🔹 Google Sign-In (Attempts Popup first, falls back to Redirect)
+  const googleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+
+    try {
+      const res = await signInWithPopup(auth, provider);
+      if (res?.user) {
+        const udoc = doc(db, "users", res.user.uid);
+        const snap = await getDoc(udoc);
+        if (!snap.exists()) {
+          const isFirst = await checkIfFirstUser();
+          await setDoc(udoc, {
+            displayName: res.user.displayName || "",
+            email: res.user.email,
+            isAdmin: isFirst,
+            createdAt: new Date(),
+          });
         }
-    };
-
-    // 🔹 Signup
-    const signup = async (email, password, displayName = "") => {
-        const res = await createUserWithEmailAndPassword(auth, email, password);
-        const isFirst = await checkIfFirstUser();
-
-        try {
-            await setDoc(doc(db, "users", res.user.uid), {
-                displayName,
-                email,
-                isAdmin: isFirst,
-                createdAt: new Date(),
-            });
-        } catch (error) {
-            console.error("Error creating user doc on signup:", error);
-        }
-
-        return res;
-    };
-
-    // 🔹 Login
-    const login = (email, password) =>
-        signInWithEmailAndPassword(auth, email, password);
-
-    // 🔹 Google Sign-In via Redirect (Fixes COOP popup blocking)
-    const googleSignIn = async () => {
-        const provider = new GoogleAuthProvider();
+      }
+      return res;
+    } catch (err) {
+      console.warn("Popup blocked or failed. Fallback to redirect:", err);
+      if (
+        err.code === "auth/popup-blocked" ||
+        err.code === "auth/popup-closed-by-user" ||
+        err.code === "auth/cancelled-popup-request"
+      ) {
         await signInWithRedirect(auth, provider);
-    };
+      } else {
+        throw err;
+      }
+    }
+  };
 
-    // 🔹 Logout
-    const logout = () => signOut(auth);
+  // 🔹 Logout
+  const logout = () => signOut(auth);
 
-    // 🔹 Watch auth changes & process Google redirect results
-    useEffect(() => {
-        // Handle post-redirect return from Google authentication
-        getRedirectResult(auth)
-            .then(async (res) => {
-                if (res?.user) {
-                    const udoc = doc(db, "users", res.user.uid);
-                    const snap = await getDoc(udoc);
+  // 🔹 Process Redirect Result & Monitor Auth State Sequence
+  useEffect(() => {
+    let isSubscribed = true;
 
-                    if (!snap.exists()) {
-                        const isFirst = await checkIfFirstUser();
-                        await setDoc(udoc, {
-                            displayName: res.user.displayName || "",
-                            email: res.user.email,
-                            isAdmin: isFirst,
-                            createdAt: new Date(),
-                        });
-                    }
-                }
-            })
-            .catch((error) => {
-                console.error("Error processing Google redirect result:", error);
+    const initAuth = async () => {
+      // 1. Process Google Redirect Result First
+      try {
+        const res = await getRedirectResult(auth);
+        if (res?.user) {
+          const udoc = doc(db, "users", res.user.uid);
+          const snap = await getDoc(udoc);
+
+          if (!snap.exists()) {
+            const isFirst = await checkIfFirstUser();
+            await setDoc(udoc, {
+              displayName: res.user.displayName || "",
+              email: res.user.email,
+              isAdmin: isFirst,
+              createdAt: new Date(),
             });
+          }
+        }
+      } catch (error) {
+        console.error("Error processing Google redirect result:", error);
+      }
 
-        const unsub = onAuthStateChanged(auth, async (u) => {
-            if (u) {
-                let userData = {};
-                let userIsAdmin = false;
+      // 2. Attach Listener for Current Auth User
+      const unsub = onAuthStateChanged(auth, async (u) => {
+        if (!isSubscribed) return;
 
-                try {
-                    const udoc = doc(db, "users", u.uid);
-                    const snapshot = await getDoc(udoc);
-                    if (snapshot.exists()) {
-                        userData = snapshot.data();
-                    }
+        if (u) {
+          let userData = {};
+          let userIsAdmin = false;
 
-                    const adminRef = doc(db, "admins", u.uid);
-                    const adminSnap = await getDoc(adminRef);
-
-                    userIsAdmin = userData.isAdmin === true || adminSnap.exists();
-                } catch (error) {
-                    console.warn("Firestore access error, falling back to basic Auth user profile:", error);
-                }
-
-                setUser({
-                    uid: u.uid,
-                    email: u.email,
-                    displayName: userData.displayName || u.displayName || "Comrade",
-                    ...userData,
-                    isAdmin: userIsAdmin,
-                });
-
-                setIsAdmin(userIsAdmin);
-            } else {
-                setUser(null);
-                setIsAdmin(false);
+          try {
+            const udoc = doc(db, "users", u.uid);
+            const snapshot = await getDoc(udoc);
+            if (snapshot.exists()) {
+              userData = snapshot.data();
             }
-            setLoading(false);
-        });
 
-        return unsub;
-    }, []);
+            const adminRef = doc(db, "admins", u.uid);
+            const adminSnap = await getDoc(adminRef);
 
-    const value = {
-        user,
-        signup,
-        login,
-        logout,
-        googleSignIn,
-        isAdmin,
+            userIsAdmin = userData.isAdmin === true || adminSnap.exists();
+          } catch (error) {
+            console.warn(
+              "Firestore access error, falling back to basic Auth profile:",
+              error
+            );
+          }
+
+          if (isSubscribed) {
+            setUser({
+              uid: u.uid,
+              email: u.email,
+              displayName:
+                userData.displayName || u.displayName || "Comrade",
+              ...userData,
+              isAdmin: userIsAdmin,
+            });
+            setIsAdmin(userIsAdmin);
+          }
+        } else {
+          if (isSubscribed) {
+            setUser(null);
+            setIsAdmin(false);
+          }
+        }
+
+        if (isSubscribed) {
+          setLoading(false);
+        }
+      });
+
+      return unsub;
     };
 
-    return (
-        <AuthContext.Provider value={value}>
-            {!loading ? (
-                children
-            ) : (
-                <div className="flex h-screen items-center justify-center bg-soko-cream">
-                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#ffb800] border-t-[#00a651]"></div>
-                </div>
-            )}
-        </AuthContext.Provider>
-    );
+    let unsubFn;
+    initAuth().then((unsub) => {
+      unsubFn = unsub;
+    });
+
+    return () => {
+      isSubscribed = false;
+      if (unsubFn) unsubFn();
+    };
+  }, []);
+
+  const value = {
+    user,
+    signup,
+    login,
+    logout,
+    googleSignIn,
+    isAdmin,
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading ? (
+        children
+      ) : (
+        <div className="flex h-screen items-center justify-center bg-soko-cream">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#ffb800] border-t-[#00a651]"></div>
+        </div>
+      )}
+    </AuthContext.Provider>
+  );
 }
