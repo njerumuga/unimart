@@ -19,7 +19,7 @@ export default function SellerProfile() {
   useEffect(() => {
     if (!sellerId) return;
 
-    // 1. Fetch Seller's Items (Primary: sellerId, Fallback: userId)
+    // 1. Fetch Seller's Items
     const itemsQuery = query(
       collection(db, "items"),
       where("sellerId", "==", sellerId)
@@ -34,7 +34,6 @@ export default function SellerProfile() {
         }));
 
         if (items.length === 0) {
-          // Fallback query in case items store owner reference under userId
           const fallbackQuery = query(
             collection(db, "items"),
             where("userId", "==", sellerId)
@@ -102,11 +101,9 @@ export default function SellerProfile() {
     };
   }, [sellerId]);
 
-  // Check self-rating or prior review submission
   const isOwnProfile = user && user.uid === sellerId;
   const hasUserReviewed = user && reviews.some((r) => r.reviewerId === user.uid);
 
-  // Calculate average rating
   const avgRating =
     reviews.length > 0
       ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1)
@@ -119,9 +116,9 @@ export default function SellerProfile() {
           <p className="text-gray-500">Loading seller profile...</p>
         </div>
       ) : (
-        <div>
+        <div className="space-y-8">
           {/* Header & Review Action */}
-          <div className="mb-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-800">
@@ -137,7 +134,6 @@ export default function SellerProfile() {
                 </div>
               </div>
 
-              {/* Prevent self-review and multiple reviews */}
               {!isOwnProfile && (
                 <div>
                   {hasUserReviewed ? (
@@ -164,48 +160,52 @@ export default function SellerProfile() {
                 </div>
               )}
             </div>
+          </div>
 
-            {/* Display Customer Reviews */}
-            {reviews.length > 0 && (
-              <div className="mt-6 border-t border-gray-100 pt-4">
-                <h3 className="mb-3 font-semibold text-gray-700">Customer Reviews</h3>
-                <div className="space-y-3">
-                  {reviews.map((rev) => (
-                    <div key={rev.id} className="rounded-lg bg-gray-50 p-3 text-sm">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-800">
-                            {rev.reviewerName || "Verified Buyer"}
-                          </span>
-                          {rev.itemTitle && (
-                            <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">
-                              Item: {rev.itemTitle}
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-amber-500">{"★".repeat(rev.rating || 5)}</span>
-                      </div>
-                      {rev.comment && <p className="mt-1 text-gray-600">{rev.comment}</p>}
-                    </div>
-                  ))}
-                </div>
+          {/* Section 1: Items Listed by Seller */}
+          <div>
+            <h2 className="mb-4 text-xl font-bold text-gray-800">Items Listed by Seller</h2>
+            {sellerItems.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center">
+                <p className="font-medium text-gray-500">This seller currently has no active listings.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                {sellerItems.map((item) => (
+                  <ItemCard key={item.id} item={item} isSellerView={true} />
+                ))}
               </div>
             )}
           </div>
 
-          {/* Seller Items Grid */}
-          <h2 className="mb-4 text-xl font-bold text-gray-800">Items Listed by Seller</h2>
-          {sellerItems.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center">
-              <p className="font-medium text-gray-500">This seller currently has no active listings.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              {sellerItems.map((item) => (
-                <ItemCard key={item.id} item={item} isSellerView={true} />
-              ))}
-            </div>
-          )}
+          {/* Section 2: Customer Reviews (Moved Below Listings) */}
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <h3 className="mb-4 text-lg font-bold text-gray-800">Customer Reviews</h3>
+            {reviews.length === 0 ? (
+              <p className="text-sm text-gray-500">No reviews yet for this seller.</p>
+            ) : (
+              <div className="space-y-3">
+                {reviews.map((rev) => (
+                  <div key={rev.id} className="rounded-xl bg-gray-50 p-4 text-sm">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-gray-800">
+                          {rev.reviewerName || "Verified Buyer"}
+                        </span>
+                        {rev.itemTitle && (
+                          <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">
+                            Item: {rev.itemTitle}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-amber-500 font-bold">{"★".repeat(rev.rating || 5)}</span>
+                    </div>
+                    {rev.comment && <p className="mt-2 text-gray-600">{rev.comment}</p>}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Rating Modal */}
           {isModalOpen && (
