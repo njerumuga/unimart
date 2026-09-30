@@ -52,26 +52,35 @@ export default function PostItem() {
                 imageUrl = await uploadToCloudinary(file);
             }
 
+            const phoneVal = form.sellerPhone.trim();
+
             await addDoc(collection(db, "items"), {
-                title: form.title,
+                title: form.title.trim(),
                 price: Number(form.price),
-                description: form.description,
+                description: form.description.trim(),
                 category: form.category,
                 locationZone: form.locationZone || "Main Gate",
                 condition: form.condition,
                 imageUrl,
-                sellerPhone: form.sellerPhone,
+                sellerPhone: phoneVal,
+                whatsapp: phoneVal, // Unified key for Android app compatibility
+                phone: phoneVal,
                 userId: user.uid,
                 userName: user.displayName || user.email,
+                sellerName: user.displayName || user.email || "Student Seller",
                 createdAt: serverTimestamp(),
                 isFeatured: false,
                 requestFeatured: form.requestFeatured || false,
                 paid: false,
-                isApproved: false,
+                isApproved: false, // Forces Pending Admin Approval
             });
 
-            alert("✅ Item posted successfully! Pending admin approval.");
-            nav("/");
+            // Redirect seller to Admin WhatsApp (0704196402 -> 254704196402)
+            const adminPhone = "254704196402";
+            const textMsg = encodeURIComponent(
+                `Hello Admin, I have just posted '${form.title.trim()}' on SokoHub and need approval.`
+            );
+            window.location.href = `https://wa.me/${adminPhone}?text=${textMsg}`;
         } catch (err) {
             console.error("❌ Error posting item:", err);
             alert("Error: " + err.message);
