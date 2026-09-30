@@ -35,7 +35,10 @@ export default function Home() {
         );
         const unsub = onSnapshot(q, (snap) => {
             const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-            const visibleItems = isAdmin ? arr : arr.filter((i) => i.isApproved);
+            // Strictly enforce approval check for non-admin users
+            const visibleItems = isAdmin 
+                ? arr 
+                : arr.filter((i) => i.isApproved === true);
             setItems(visibleItems);
         });
         return () => unsub();
