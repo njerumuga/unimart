@@ -75,12 +75,18 @@ export default function PostItem() {
                 isApproved: false, // Forces Pending Admin Approval
             });
 
-            // Redirect seller to Admin WhatsApp (0704196402 -> 254704196402)
+            // Prepare WhatsApp prompt for Admin (254704196402)
             const adminPhone = "254704196402";
             const textMsg = encodeURIComponent(
                 `Hello Admin, I have just posted '${form.title.trim()}' on SokoHub and need approval.`
             );
-            window.location.href = `https://wa.me/${adminPhone}?text=${textMsg}`;
+            const waUrl = `https://wa.me/${adminPhone}?text=${textMsg}`;
+
+            // Open WhatsApp in new tab (bypasses browser pop-up blockers & single-page navigation conflicts)
+            window.open(waUrl, "_blank");
+
+            // Redirect seller to homepage
+            nav("/");
         } catch (err) {
             console.error("❌ Error posting item:", err);
             alert("Error: " + err.message);
