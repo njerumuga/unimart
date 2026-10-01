@@ -44,18 +44,16 @@ function Navbar() {
 
                 {/* Actions Section */}
                 <div className="flex items-center gap-3 md:gap-5">
-                    {user && (
-                        <Link 
-                            to="/post" 
-                            className="text-[10px] font-black uppercase tracking-tighter hover:text-[#ffb800] md:text-sm"
-                        >
-                            Sell
-                        </Link>
-                    )}
+                    <Link 
+                        to="/post" 
+                        className="text-[10px] font-black uppercase tracking-wider hover:text-[#ffb800] md:text-xs transition-colors"
+                    >
+                        + Sell Item
+                    </Link>
                     
                     <Link
                         to="/advertise"
-                        className="rounded-full bg-[#ffb800] px-3 py-1.5 text-[10px] font-black uppercase text-black transition hover:scale-105 hover:bg-yellow-400 md:px-6 md:py-2 md:text-xs"
+                        className="rounded-full bg-[#ffb800] px-3.5 py-1.5 text-[10px] font-black uppercase text-black transition hover:scale-105 hover:bg-yellow-400 md:px-5 md:py-2 md:text-xs shadow-sm"
                     >
                         Advertise
                     </Link>
@@ -64,18 +62,18 @@ function Navbar() {
 
                     {user ? (
                         <div className="flex items-center gap-3 md:gap-4">
-                            <Link to="/profile" className="text-[10px] font-black text-[#ffb800] md:text-sm">
+                            <Link to="/profile" className="text-[10px] font-black text-[#ffb800] md:text-xs hover:underline">
                                 {getFirstName()}
                             </Link>
                             <button 
                                 onClick={handleLogout} 
-                                className="text-[8px] font-black uppercase text-green-100 md:text-[10px]"
+                                className="text-[8px] font-black uppercase text-green-100 md:text-[10px] hover:text-white transition-colors"
                             >
                                 Logout
                             </button>
                         </div>
                     ) : (
-                        <Link to="/login" className="text-[10px] font-black hover:text-[#ffb800] md:text-sm">
+                        <Link to="/login" className="text-[10px] font-black hover:text-[#ffb800] md:text-xs transition-colors">
                             Login
                         </Link>
                     )}

@@ -40,7 +40,7 @@ export default function SellerRatingModal({
       await addDoc(collection(db, "reviews"), {
         sellerId,
         reviewerId: user.uid,
-        reviewerName: user.displayName || user.email || "Anonymous Comrade",
+        reviewerName: user.displayName || user.email?.split("@")[0] || "Verified Comrade",
         rating: Number(rating),
         comment: comment.trim(),
         itemId: selectedItemId || null,
@@ -63,36 +63,39 @@ export default function SellerRatingModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
-        <div className="flex items-center justify-between border-b pb-3">
-          <h3 className="text-lg font-black uppercase text-gray-900">
-            Rate <span className="text-[#00a651]">{sellerName || "Seller"}</span>
-          </h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-fadeIn">
+      <div className="w-full max-w-md rounded-[32px] bg-white p-6 sm:p-8 shadow-2xl border border-gray-100">
+        <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+          <div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#00a651]">Feedback</span>
+            <h3 className="text-lg font-black text-gray-900">
+              Rate {sellerName || "Seller"}
+            </h3>
+          </div>
           <button
             onClick={onClose}
-            className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+            className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition"
           >
             ✕
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-5">
           {/* Optional Product Selector */}
           {sellerItems.length > 0 && (
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-2">
+              <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">
                 Purchased Item (Optional)
               </label>
               <select
                 value={selectedItemId}
                 onChange={(e) => setSelectedItemId(e.target.value)}
-                className="w-full rounded-2xl border border-gray-200 p-3 text-sm outline-none focus:border-[#00a651]"
+                className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20 bg-white"
               >
                 <option value="">-- General Seller Review --</option>
                 {sellerItems.map((item) => (
                   <option key={item.id} value={item.id}>
-                    {item.title} (KSh {item.price})
+                    {item.title} (KSh {Number(item.price || 0).toLocaleString()})
                   </option>
                 ))}
               </select>
@@ -101,17 +104,17 @@ export default function SellerRatingModal({
 
           {/* Star Rating Selection */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-2">
-              Star Rating
+            <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">
+              Rating
             </label>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-[#f9fffb] p-3 rounded-2xl border border-green-100 justify-center">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   type="button"
                   key={star}
                   onClick={() => setRating(star)}
-                  className={`text-2xl transition-transform hover:scale-125 ${
-                    star <= rating ? "text-[#ffb800]" : "text-gray-300"
+                  className={`text-3xl transition-transform hover:scale-125 focus:outline-none ${
+                    star <= rating ? "text-[#ffb800]" : "text-gray-200"
                   }`}
                 >
                   ★
@@ -122,25 +125,25 @@ export default function SellerRatingModal({
 
           {/* Review Input */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-2">
-              Review / Experience
+            <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">
+              Your Review / Experience
             </label>
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Share your experience buying from this seller..."
-              rows="4"
+              placeholder="Was the item in good condition? Fast response? Polite seller?"
+              rows="3"
               required
-              className="w-full rounded-2xl border border-gray-200 p-3 text-sm outline-none focus:border-[#00a651]"
+              className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20"
             />
           </div>
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-2xl bg-[#00a651] py-3 text-xs font-black uppercase tracking-widest text-white shadow-md transition-all hover:bg-black disabled:opacity-50"
+            className="w-full rounded-2xl bg-[#00a651] hover:bg-emerald-600 py-3.5 text-xs font-black uppercase tracking-widest text-white shadow-md transition-all hover:shadow-lg disabled:opacity-50"
           >
-            {submitting ? "Submitting..." : "Submit Review"}
+            {submitting ? "Submitting Review..." : "Submit Review"}
           </button>
         </form>
       </div>

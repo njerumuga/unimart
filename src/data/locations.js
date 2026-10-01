@@ -1,7 +1,7 @@
 export const locations = [
   "Main Gate",
   "Nchiru",
-  "kunene",
+  "Kunene",
   "Kaithe",
   "Kianjai",
   "Campus Hostels",
