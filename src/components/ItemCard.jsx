@@ -14,6 +14,9 @@ export default function ItemCard({ item, isSellerView = false }) {
   const rawPhone = item?.sellerPhone || item?.phone || item?.whatsapp || item?.whatsappNumber || "";
   const locationZone = item?.locationZone || item?.location || "Meru";
 
+  const hasVideo = !!item?.videoUrl || (Array.isArray(item?.media) && item.media.some((m) => m.type === "video"));
+  const mediaCount = Array.isArray(item?.imageUrls) ? item.imageUrls.length : (Array.isArray(item?.media) ? item.media.length : 1);
+
   const handleWhatsAppClick = (e) => {
     e.stopPropagation();
 
@@ -62,13 +65,24 @@ export default function ItemCard({ item, isSellerView = false }) {
           </div>
         </div>
 
-        {item?.isFeatured && (
-          <div className="absolute bottom-4 left-4">
+        {/* Media Badges */}
+        <div className="absolute bottom-4 left-4 flex flex-wrap gap-1.5">
+          {item?.isFeatured && (
             <span className="bg-[#ffb800] text-black text-[10px] font-black uppercase px-2.5 py-1 rounded-xl shadow-md">
               ⭐ Featured
             </span>
-          </div>
-        )}
+          )}
+          {hasVideo && (
+            <span className="bg-red-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-lg shadow-md flex items-center gap-1">
+              <span>▶</span> Video
+            </span>
+          )}
+          {mediaCount > 1 && !hasVideo && (
+            <span className="bg-black/75 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded-lg shadow-md">
+              📷 {mediaCount}
+            </span>
+          )}
+        </div>
       </Link>
 
       {/* Content Section */}

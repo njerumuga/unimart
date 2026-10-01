@@ -249,7 +249,7 @@ export default function SellerProfile() {
                     Verified Buyer Reviews
                   </h3>
                   <p className="text-xs text-gray-500">
-                    Feedback from Meru University students and buyers
+                    Feedback & media proof from Meru University students and buyers
                   </p>
                 </div>
                 {avgRating && (
@@ -266,35 +266,86 @@ export default function SellerProfile() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {reviews.map((rev) => (
-                    <div key={rev.id} className="rounded-2xl bg-[#f9fffb] border border-green-100/60 p-5 text-sm space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="h-7 w-7 rounded-full bg-green-100 text-[#00a651] text-xs font-black flex items-center justify-center">
-                            {(rev.reviewerName || "U").charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <span className="font-bold text-gray-800 text-xs block">
-                              {rev.reviewerName || "Verified Buyer"}
+                  {reviews.map((rev) => {
+                    const reviewMedia = Array.isArray(rev.media) && rev.media.length > 0
+                      ? rev.media
+                      : [
+                          ...(Array.isArray(rev.images) ? rev.images.map(url => ({ url, type: "image" })) : []),
+                          ...(rev.imageUrl && !Array.isArray(rev.images) ? [{ url: rev.imageUrl, type: "image" }] : []),
+                          ...(rev.videoUrl ? [{ url: rev.videoUrl, type: "video" }] : [])
+                        ];
+
+                    return (
+                      <div key={rev.id} className="rounded-2xl bg-[#f9fffb] border border-green-100/60 p-5 text-sm space-y-3 flex flex-col justify-between">
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="h-7 w-7 rounded-full bg-green-100 text-[#00a651] text-xs font-black flex items-center justify-center">
+                                {(rev.reviewerName || "U").charAt(0).toUpperCase()}
+                              </div>
+                              <div>
+                                <span className="font-bold text-gray-800 text-xs block">
+                                  {rev.reviewerName || "Verified Buyer"}
+                                </span>
+                                {rev.itemTitle && (
+                                  <span className="text-[10px] text-gray-400 truncate max-w-[150px] block">
+                                    Bought: {rev.itemTitle}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <span className="text-amber-500 font-bold text-sm tracking-widest">
+                              {"★".repeat(rev.rating || 5)}
                             </span>
-                            {rev.itemTitle && (
-                              <span className="text-[10px] text-gray-400 truncate max-w-[150px] block">
-                                Bought: {rev.itemTitle}
-                              </span>
-                            )}
                           </div>
+
+                          {rev.comment && (
+                            <p className="text-xs text-gray-600 leading-relaxed pt-1">
+                              "{rev.comment}"
+                            </p>
+                          )}
                         </div>
-                        <span className="text-amber-500 font-bold text-sm tracking-widest">
-                          {"★".repeat(rev.rating || 5)}
-                        </span>
+
+                        {/* Buyer Media Proof (Photos & Videos) */}
+                        {reviewMedia.length > 0 && (
+                          <div className="pt-2 border-t border-green-100/50 space-y-2">
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                              <span>📸</span> Buyer Media Proof ({reviewMedia.length})
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {reviewMedia.map((m, mIdx) => (
+                                m.type === "video" ? (
+                                  <div key={mIdx} className="w-full rounded-xl overflow-hidden bg-black shadow-sm">
+                                    <video
+                                      src={m.url}
+                                      controls
+                                      playsInline
+                                      className="w-full max-h-48 object-contain"
+                                    />
+                                  </div>
+                                ) : (
+                                  <a
+                                    key={mIdx}
+                                    href={m.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="relative w-16 h-16 rounded-xl overflow-hidden border border-gray-200 hover:border-[#00a651] hover:scale-105 transition-all shadow-sm block bg-white"
+                                    title="View full image"
+                                  >
+                                    <img
+                                      src={m.url}
+                                      alt="Buyer product proof"
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </a>
+                                )
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      {rev.comment && (
-                        <p className="text-xs text-gray-600 leading-relaxed pt-1">
-                          "{rev.comment}"
-                        </p>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

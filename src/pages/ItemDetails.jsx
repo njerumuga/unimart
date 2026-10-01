@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -9,6 +9,7 @@ export default function ItemDetails() {
     const [item, setItem] = useState(null);
     const [loading, setLoading] = useState(true);
     const [copied, setCopied] = useState(false);
+    const [activeMediaIndex, setActiveMediaIndex] = useState(0);
 
     useEffect(() => {
         async function fetchItem() {
@@ -34,8 +35,29 @@ export default function ItemDetails() {
                 setLoading(false);
             }
         }
-        fetchItem();
+        void fetchItem();
     }, [id]);
+
+    const mediaList = useMemo(() => {
+        if (!item) return [];
+        if (Array.isArray(item.media) && item.media.length > 0) {
+            return item.media;
+        }
+        const list = [];
+        if (Array.isArray(item.imageUrls) && item.imageUrls.length > 0) {
+            item.imageUrls.forEach((url) => {
+                if (url) list.push({ url, type: "image" });
+            });
+        } else if (item.imageUrl) {
+            list.push({ url: item.imageUrl, type: "image" });
+        }
+        if (item.videoUrl && !list.some((m) => m.url === item.videoUrl)) {
+            list.push({ url: item.videoUrl, type: "video" });
+        }
+        return list.length > 0 ? list : [{ url: "https://via.placeholder.com/600x600?text=No+Image", type: "image" }];
+    }, [item]);
+
+    const activeMedia = mediaList[activeMediaIndex] || mediaList[0] || { url: "", type: "image" };
 
     const formatWhatsAppNumber = (rawNumber) => {
         if (!rawNumber) return "";
@@ -133,15 +155,29 @@ export default function ItemDetails() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* Left Column: Media & Highlights */}
                     <div className="lg:col-span-7 space-y-4">
-                        <div className="relative aspect-square sm:aspect-[4/3] rounded-[32px] overflow-hidden bg-white border border-gray-100 shadow-soft">
-                            <img
-                                src={item.imageUrl}
-                                alt={item.title}
-                                className="w-full h-full object-cover"
-                            />
+                        {/* Primary Media Display Viewport */}
+                        <div className="relative aspect-square sm:aspect-[4/3] rounded-[32px] overflow-hidden bg-black/5 border border-gray-100 shadow-soft flex items-center justify-center">
+                            {activeMedia.type === "video" ? (
+                                <div className="w-full h-full bg-black flex items-center justify-center">
+                                    <video
+                                        key={activeMedia.url}
+                                        src={activeMedia.url}
+                                        controls
+                                        playsInline
+                                        autoPlay
+                                        className="w-full h-full object-contain max-h-[500px]"
+                                    />
+                                </div>
+                            ) : (
+                                <img
+                                    src={activeMedia.url}
+                                    alt={item.title}
+                                    className="w-full h-full object-cover"
+                                />
+                            )}
 
                             {/* Badges Overlays */}
-                            <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                            <div className="absolute top-4 left-4 flex flex-wrap gap-2 pointer-events-none">
                                 <div className="bg-black/75 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase backdrop-blur-md">
                                     📍 {locationZone}
                                 </div>
@@ -150,10 +186,15 @@ export default function ItemDetails() {
                                         ⭐ Featured
                                     </div>
                                 )}
+                                {activeMedia.type === "video" && (
+                                    <div className="bg-red-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg flex items-center gap-1.5">
+                                        <span>▶</span> Product Video Demo
+                                    </div>
+                                )}
                             </div>
 
                             {item.condition && (
-                                <div className="absolute bottom-4 left-4">
+                                <div className="absolute bottom-4 left-4 pointer-events-none">
                                     <div className="bg-white/90 text-gray-800 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase backdrop-blur-md shadow-sm border border-gray-200/50">
                                         Condition: <span className="text-[#00a651]">{item.condition}</span>
                                     </div>
@@ -163,7 +204,7 @@ export default function ItemDetails() {
                             {/* Share button */}
                             <button
                                 onClick={handleShare}
-                                className="absolute top-4 right-4 bg-white/90 hover:bg-white text-gray-700 p-2.5 rounded-full shadow-md backdrop-blur-md transition hover:scale-110 active:scale-95"
+                                className="absolute top-4 right-4 bg-white/90 hover:bg-white text-gray-700 p-2.5 rounded-full shadow-md backdrop-blur-md transition hover:scale-110 active:scale-95 z-10"
                                 title="Share Listing"
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,6 +212,46 @@ export default function ItemDetails() {
                                 </svg>
                             </button>
                         </div>
+
+                        {/* Interactive Media Thumbnail Strip */}
+                        {mediaList.length > 1 && (
+                            <div className="bg-white rounded-[24px] p-3 border border-gray-100 shadow-sm">
+                                <div className="flex items-center justify-between mb-2 px-1">
+                                    <span className="text-[10px] font-black uppercase tracking-wider text-gray-400">
+                                        Media Gallery ({activeMediaIndex + 1} of {mediaList.length})
+                                    </span>
+                                    <span className="text-[10px] font-bold text-[#00a651]">
+                                        Click thumbnail to preview
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                                    {mediaList.map((media, idx) => (
+                                        <button
+                                            key={idx}
+                                            type="button"
+                                            onClick={() => setActiveMediaIndex(idx)}
+                                            className={`relative flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden border-2 transition-all ${
+                                                activeMediaIndex === idx
+                                                    ? "border-[#00a651] ring-2 ring-[#00a651]/30 scale-105"
+                                                    : "border-gray-200 opacity-70 hover:opacity-100"
+                                            }`}
+                                        >
+                                            {media.type === "video" ? (
+                                                <div className="w-full h-full bg-black flex items-center justify-center">
+                                                    <span className="text-white text-xs font-black">▶ Video</span>
+                                                </div>
+                                            ) : (
+                                                <img
+                                                    src={media.url}
+                                                    alt={`Thumbnail ${idx}`}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {copied && (
                             <div className="p-3 bg-green-100 text-[#00a651] text-xs font-bold rounded-2xl text-center">
@@ -232,7 +313,7 @@ export default function ItemDetails() {
                             {/* Description */}
                             <div className="space-y-2">
                                 <h3 className="text-xs uppercase tracking-widest font-black text-gray-400">
-                                    Description
+                                    Description & Usage Details
                                 </h3>
                                 <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
                                     {item.description || "No specific description provided by seller."}

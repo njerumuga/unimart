@@ -3,7 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { db } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { Link } from "react-router-dom";
-import { uploadToCloudinary } from "../cloudinary";
+import { uploadMultipleToCloudinary } from "../cloudinary";
 import { categories } from "../data/categories";
 import { locations } from "../data/locations";
 
@@ -21,9 +21,9 @@ export default function PostItem() {
         requestFeatured: false,
     });
 
-    const [file, setFile] = useState(null);
-    const [preview, setPreview] = useState("");
+    const [files, setFiles] = useState([]); // Array of { file, preview, type, id }
     const [loading, setLoading] = useState(false);
+    const [uploadStatus, setUploadStatus] = useState("");
 
     if (!user) {
         return (
@@ -47,17 +47,82 @@ export default function PostItem() {
         );
     }
 
+    const handleFileChange = (e) => {
+        const selectedFiles = Array.from(e.target.files || []);
+        if (!selectedFiles.length) return;
+
+        // Limit to 8 media files total
+        const remainingSlots = 8 - files.length;
+        if (remainingSlots <= 0) {
+            alert("Maximum 8 photos/videos allowed per listing.");
+            return;
+        }
+
+        const allowedFiles = selectedFiles.slice(0, remainingSlots);
+        const newFileEntries = allowedFiles.map((f) => ({
+            file: f,
+            preview: URL.createObjectURL(f),
+            type: f.type.startsWith("video/") ? "video" : "image",
+            id: Math.random().toString(36).substring(7),
+        }));
+
+        setFiles((prev) => [...prev, ...newFileEntries]);
+        e.target.value = ""; // Reset input
+    };
+
+    const handleRemoveFile = (idToRemove) => {
+        setFiles((prev) => {
+            const item = prev.find((f) => f.id === idToRemove);
+            if (item && item.preview) URL.revokeObjectURL(item.preview);
+            return prev.filter((f) => f.id !== idToRemove);
+        });
+    };
+
+    const handleSetCover = (index) => {
+        if (index === 0) return;
+        setFiles((prev) => {
+            const copy = [...prev];
+            const [selected] = copy.splice(index, 1);
+            copy.unshift(selected);
+            return copy;
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+        setUploadStatus("Uploading media files to Cloudinary...");
 
         try {
-            let imageUrl = "";
-            if (file) {
-                imageUrl = await uploadToCloudinary(file);
+            let uploadedMedia = [];
+            if (files.length > 0) {
+                const rawFiles = files.map((item) => item.file);
+                uploadedMedia = await uploadMultipleToCloudinary(
+                    rawFiles,
+                    (done, total, percent) => {
+                        setUploadStatus(`Uploading media (${done}/${total}) — ${percent}%...`);
+                    }
+                );
             }
 
+            // Determine image URLs and video URL
+            const imageUrls = uploadedMedia
+                .filter((m) => m.type === "image")
+                .map((m) => m.url);
+            
+            const videoMedia = uploadedMedia.find((m) => m.type === "video");
+            const videoUrl = videoMedia ? videoMedia.url : "";
+
+            // Primary image
+            const primaryImageUrl = imageUrls.length > 0
+                ? imageUrls[0]
+                : uploadedMedia.length > 0
+                ? uploadedMedia[0].url
+                : "https://via.placeholder.com/600x400?text=No+Image";
+
             const phoneVal = form.sellerPhone.trim();
+
+            setUploadStatus("Saving listing to SokoHub...");
 
             await addDoc(collection(db, "items"), {
                 title: form.title.trim(),
@@ -66,7 +131,10 @@ export default function PostItem() {
                 category: form.category,
                 locationZone: form.locationZone || "Main Gate",
                 condition: form.condition,
-                imageUrl,
+                imageUrl: primaryImageUrl,
+                imageUrls: imageUrls.length > 0 ? imageUrls : [primaryImageUrl],
+                videoUrl: videoUrl,
+                media: uploadedMedia,
                 sellerPhone: phoneVal,
                 whatsapp: phoneVal,
                 phone: phoneVal,
@@ -84,7 +152,7 @@ export default function PostItem() {
             // Redirect directly to WhatsApp Admin chat
             const adminPhone = "254704196402";
             const textMsg = encodeURIComponent(
-                `Hello Admin, I have just posted '${form.title.trim()}' on SokoHub and need approval.`
+                `Hello Admin, I have just posted '${form.title.trim()}' on SokoHub with ${uploadedMedia.length} media files and need approval.`
             );
 
             window.location.href = `https://wa.me/${adminPhone}?text=${textMsg}`;
@@ -92,6 +160,7 @@ export default function PostItem() {
             console.error("❌ Error posting item:", err);
             alert("Error: " + err.message);
             setLoading(false);
+            setUploadStatus("");
         }
     };
 
@@ -109,7 +178,7 @@ export default function PostItem() {
                         Post a New Listing
                     </h2>
                     <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                        Reach verified campus buyers in Meru and surrounding student hostels
+                        Reach verified campus buyers in Meru with photos and product demo videos
                     </p>
                 </div>
 
@@ -125,7 +194,7 @@ export default function PostItem() {
                             value={form.title}
                             onChange={(e) => setForm({ ...form, title: e.target.value })}
                             required
-                            className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20"
+                            className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20 font-bold"
                         />
                     </div>
 
@@ -160,7 +229,7 @@ export default function PostItem() {
                                 name="condition"
                                 value={form.condition}
                                 onChange={(e) => setForm({ ...form, condition: e.target.value })}
-                                className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20 bg-white"
+                                className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20 bg-white font-bold"
                             >
                                 <option value="Brand New">Brand New</option>
                                 <option value="Used - Like New">Used - Like New</option>
@@ -181,7 +250,7 @@ export default function PostItem() {
                                 value={form.category}
                                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                                 required
-                                className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20 bg-white"
+                                className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20 bg-white font-bold"
                             >
                                 <option value="">Select Category</option>
                                 {categories.map((cat) => (
@@ -201,7 +270,7 @@ export default function PostItem() {
                                 value={form.locationZone}
                                 onChange={(e) => setForm({ ...form, locationZone: e.target.value })}
                                 required
-                                className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20 bg-white"
+                                className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20 bg-white font-bold"
                             >
                                 <option value="">Select Location</option>
                                 {locations.map((loc) => (
@@ -224,60 +293,111 @@ export default function PostItem() {
                             value={form.sellerPhone}
                             onChange={(e) => setForm({ ...form, sellerPhone: e.target.value })}
                             required
-                            className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20"
+                            className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20 font-bold"
                         />
                         <p className="text-[11px] text-gray-400 mt-1">
                             Interested buyers will message you directly on this WhatsApp number.
                         </p>
                     </div>
 
-                    {/* Image Upload */}
+                    {/* Multi-Photo & Video Upload Section */}
                     <div>
-                        <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">
-                            Product Photo
-                        </label>
-                        <div className="rounded-2xl border-2 border-dashed border-gray-200 p-6 text-center hover:border-[#00a651] transition bg-gray-50/50">
-                            <input
-                                type="file"
-                                id="file-upload"
-                                accept="image/*"
-                                onChange={(e) => {
-                                    const selected = e.target.files[0];
-                                    setFile(selected);
-                                    if (selected) setPreview(URL.createObjectURL(selected));
-                                }}
-                                className="hidden"
-                            />
-                            {preview ? (
-                                <div className="relative inline-block">
-                                    <img
-                                        src={preview}
-                                        alt="Preview"
-                                        className="h-48 w-48 sm:h-56 sm:w-56 rounded-2xl object-cover shadow-md mx-auto"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setFile(null);
-                                            setPreview("");
-                                        }}
-                                        className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1.5 shadow-lg hover:bg-red-700"
-                                    >
-                                        ✕
-                                    </button>
-                                </div>
-                            ) : (
-                                <label htmlFor="file-upload" className="cursor-pointer space-y-2 block">
+                        <div className="flex items-center justify-between mb-2">
+                            <label className="block text-xs font-black uppercase tracking-wider text-gray-700">
+                                Product Photos & Demo Video ({files.length}/8)
+                            </label>
+                            <span className="text-[10px] font-bold text-[#00a651]">
+                                Images (JPG/PNG) & Videos (MP4/WebM)
+                            </span>
+                        </div>
+
+                        <div className="space-y-4">
+                            {/* Upload Dropzone */}
+                            <div className="rounded-2xl border-2 border-dashed border-gray-200 p-6 text-center hover:border-[#00a651] transition bg-gray-50/50">
+                                <input
+                                    type="file"
+                                    id="multi-file-upload"
+                                    multiple
+                                    accept="image/*,video/*"
+                                    onChange={handleFileChange}
+                                    className="hidden"
+                                />
+                                <label htmlFor="multi-file-upload" className="cursor-pointer space-y-2 block">
                                     <div className="w-12 h-12 rounded-full bg-green-100 text-[#00a651] flex items-center justify-center mx-auto text-xl">
-                                        📷
+                                        📸
                                     </div>
                                     <p className="text-xs font-bold text-gray-700">
-                                        Click to upload high-quality item photo
+                                        Click to upload multiple product photos or demo videos
                                     </p>
                                     <p className="text-[10px] text-gray-400">
-                                        PNG, JPG, WEBP up to 10MB
+                                        Upload up to 8 photos & videos showing item condition and usage demonstration
                                     </p>
                                 </label>
+                            </div>
+
+                            {/* Media Previews Grid */}
+                            {files.length > 0 && (
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    {files.map((item, index) => (
+                                        <div
+                                            key={item.id}
+                                            className="group relative aspect-square rounded-2xl overflow-hidden bg-black/5 border-2 border-gray-200 hover:border-[#00a651] shadow-sm"
+                                        >
+                                            {item.type === "video" ? (
+                                                <div className="w-full h-full relative bg-black flex items-center justify-center">
+                                                    <video
+                                                        src={item.preview}
+                                                        className="w-full h-full object-cover opacity-80"
+                                                        muted
+                                                    />
+                                                    <div className="absolute inset-0 flex items-center justify-center">
+                                                        <div className="w-8 h-8 rounded-full bg-white/80 text-black flex items-center justify-center text-xs font-black">
+                                                            ▶
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <img
+                                                    src={item.preview}
+                                                    alt={`Preview ${index}`}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            )}
+
+                                            {/* Badges */}
+                                            <div className="absolute top-1.5 left-1.5 flex flex-col gap-1">
+                                                {index === 0 ? (
+                                                    <span className="bg-[#00a651] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-lg shadow-sm">
+                                                        Main Cover
+                                                    </span>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleSetCover(index)}
+                                                        className="bg-black/70 hover:bg-[#00a651] text-white text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-md transition"
+                                                    >
+                                                        Set Cover
+                                                    </button>
+                                                )}
+                                                {item.type === "video" && (
+                                                    <span className="bg-red-600 text-white text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md">
+                                                        🎥 Video
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            {/* Remove Button */}
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveFile(item.id)}
+                                                className="absolute top-1.5 right-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-md transition"
+                                                title="Remove file"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
                             )}
                         </div>
                     </div>
@@ -289,12 +409,12 @@ export default function PostItem() {
                         </label>
                         <textarea
                             name="description"
-                            placeholder="Provide details about specs, condition, reasons for selling, pick-up points..."
+                            placeholder="Provide details about specs, condition, how the item is used, reasons for selling, pick-up points..."
                             value={form.description}
                             onChange={(e) => setForm({ ...form, description: e.target.value })}
                             required
                             rows="4"
-                            className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20"
+                            className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20 font-medium"
                         />
                     </div>
 
@@ -320,6 +440,14 @@ export default function PostItem() {
                         </label>
                     </div>
 
+                    {/* Upload Status Alert */}
+                    {uploadStatus && (
+                        <div className="p-3 bg-green-50 border border-green-200 text-[#00a651] rounded-2xl text-xs font-bold flex items-center gap-2">
+                            <div className="w-3.5 h-3.5 border-2 border-[#00a651] border-t-transparent rounded-full animate-spin"></div>
+                            <span>{uploadStatus}</span>
+                        </div>
+                    )}
+
                     {/* Submit Button */}
                     <button
                         type="submit"
@@ -329,7 +457,7 @@ export default function PostItem() {
                         {loading ? (
                             <>
                                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                <span>Posting Item...</span>
+                                <span>Processing & Uploading...</span>
                             </>
                         ) : (
                             <span>Post Item & Request Approval</span>

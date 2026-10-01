@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom"; 
 import ItemCard from "../components/ItemCard";
+import SellerBundleCard from "../components/SellerBundleCard";
 import { db } from "../firebase";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
@@ -12,6 +13,7 @@ export default function Home() {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [selectedLocation, setSelectedLocation] = useState("All");
     const [searchQuery, setSearchQuery] = useState("");
+    const [viewMode, setViewMode] = useState("bundled"); // "bundled" by default or "single"
     const [showSecretBtn, setShowSecretBtn] = useState(false); 
     const [loading, setLoading] = useState(true);
     const { isAdmin } = useAuth();
@@ -78,6 +80,25 @@ export default function Home() {
 
         return filtered;
     }, [items, selectedCategory, selectedLocation, searchQuery]);
+
+    // Group items by Seller into Bundles
+    const sellerBundles = useMemo(() => {
+        const map = new Map();
+        filteredItems.forEach((item) => {
+            const sId = item.sellerId || item.userId || item.sellerName || "unknown";
+            if (!map.has(sId)) {
+                map.set(sId, {
+                    sellerId: item.sellerId || item.userId || sId,
+                    sellerName: item.sellerName || item.userName || "Campus Comrade",
+                    sellerPhone: item.sellerPhone || item.whatsapp || item.phone || "",
+                    locationZone: item.locationZone || "Main Gate",
+                    items: [],
+                });
+            }
+            map.get(sId).items.push(item);
+        });
+        return Array.from(map.values());
+    }, [filteredItems]);
 
     return (
         <div className="min-h-screen bg-[#f9fffb] pb-24 relative">
@@ -147,34 +168,71 @@ export default function Home() {
                     ))}
                 </div>
 
-                {/* Location Filter Dropdown Bar */}
-                <div className="flex items-center justify-between px-2">
-                    <p className="text-xs font-bold text-gray-500">
-                        {filteredItems.length} {filteredItems.length === 1 ? "Listing" : "Listings"} found
-                    </p>
-                    <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Area:</span>
-                        <select
-                            value={selectedLocation}
-                            onChange={(e) => setSelectedLocation(e.target.value)}
-                            className="rounded-xl border border-gray-200 bg-white px-4 py-1.5 text-xs font-bold text-gray-700 outline-none focus:border-[#00a651] shadow-sm"
-                        >
-                            <option value="All">All Locations</option>
-                            {locations.map((loc) => (
-                                <option key={loc} value={loc}>
-                                    📍 {loc}
-                                </option>
-                            ))}
-                        </select>
+                {/* Location Filter & View Mode Bar */}
+                <div className="flex flex-wrap items-center justify-between gap-3 px-2 bg-white/80 backdrop-blur-md p-3 rounded-2xl border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3">
+                        <p className="text-xs font-bold text-gray-700">
+                            {viewMode === "bundled" 
+                                ? `${sellerBundles.length} ${sellerBundles.length === 1 ? "Seller Store" : "Seller Stores"} (${filteredItems.length} items)`
+                                : `${filteredItems.length} ${filteredItems.length === 1 ? "Listing" : "Listings"} found`
+                            }
+                        </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 flex-wrap">
+                        {/* View Toggle */}
+                        <div className="flex items-center bg-gray-100 p-1 rounded-xl">
+                            <button
+                                onClick={() => setViewMode("bundled")}
+                                className={`px-3 py-1 text-[11px] font-black uppercase rounded-lg transition ${
+                                    viewMode === "bundled"
+                                        ? "bg-[#00a651] text-white shadow-sm"
+                                        : "text-gray-500 hover:text-gray-900"
+                                }`}
+                                title="Group by Seller"
+                            >
+                                👥 By Seller
+                            </button>
+                            <button
+                                onClick={() => setViewMode("single")}
+                                className={`px-3 py-1 text-[11px] font-black uppercase rounded-lg transition ${
+                                    viewMode === "single"
+                                        ? "bg-[#00a651] text-white shadow-sm"
+                                        : "text-gray-500 hover:text-gray-900"
+                                }`}
+                                title="Show all items individually"
+                            >
+                                📦 All Items
+                            </button>
+                        </div>
+
+                        {/* Location Select */}
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Area:</span>
+                            <select
+                                value={selectedLocation}
+                                onChange={(e) => setSelectedLocation(e.target.value)}
+                                className="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 outline-none focus:border-[#00a651] shadow-sm"
+                            >
+                                <option value="All">All Locations</option>
+                                {locations.map((loc) => (
+                                    <option key={loc} value={loc}>
+                                        📍 {loc}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* MAIN GRID */}
+            {/* MAIN CONTENT */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
                 <div className="flex items-center gap-4 mb-8 px-2">
                     <h2 className="text-2xl font-black text-[#00a651] uppercase italic tracking-tighter">
-                       {selectedCategory === "All" ? "Featured Listings" : selectedCategory}
+                       {selectedCategory === "All" 
+                           ? (viewMode === "bundled" ? "Campus Seller Stores" : "Featured Listings") 
+                           : `${selectedCategory} ${viewMode === "bundled" ? "Sellers" : "Listings"}`}
                     </h2>
                     <div className="h-1 flex-1 bg-[#ffb800] rounded-full opacity-30"></div>
                 </div>
@@ -212,7 +270,15 @@ export default function Home() {
                             </Link>
                         </div>
                     </div>
+                ) : viewMode === "bundled" ? (
+                    /* Bundled by Seller Grid */
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {sellerBundles.map((bundle) => (
+                            <SellerBundleCard key={bundle.sellerId} bundle={bundle} />
+                        ))}
+                    </div>
                 ) : (
+                    /* Flat Item Grid */
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {filteredItems.map((item) => (
                             <ItemCard key={item.id} item={item} />
