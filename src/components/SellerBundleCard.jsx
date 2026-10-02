@@ -1,14 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import TrustBadge from "./TrustBadge";
 
 export default function SellerBundleCard({ bundle }) {
   if (!bundle || !bundle.items || bundle.items.length === 0) return null;
 
-  const { sellerId, sellerName, sellerPhone, locationZone, items } = bundle;
+  const { sellerId, sellerName, sellerPhone, items } = bundle;
   const primaryItem = items[0];
   const otherItems = items.slice(1, 4);
-  const remainingCount = items.length > 4 ? items.length - 4 : 0;
 
   const firstName = String(sellerName).trim().split(" ")[0] || "Seller";
   const sellerUrl = sellerId ? `/seller/${sellerId}` : "#";
@@ -21,11 +19,6 @@ export default function SellerBundleCard({ bundle }) {
     minPrice === maxPrice || prices.length <= 1
       ? `KSh ${minPrice.toLocaleString()}`
       : `KSh ${minPrice.toLocaleString()} – ${maxPrice.toLocaleString()}`;
-
-  // Unique categories sold by this seller
-  const sellerCategories = Array.from(
-    new Set(items.map((i) => i.category).filter(Boolean))
-  );
 
   const handleWhatsAppClick = (e) => {
     e.stopPropagation();
@@ -50,141 +43,101 @@ export default function SellerBundleCard({ bundle }) {
   };
 
   return (
-    <div className="group flex flex-col bg-white rounded-[32px] overflow-hidden transition-all duration-500 hover:shadow-2xl border-2 border-gray-100/80 hover:border-[#00a651] shadow-soft">
+    <div className="flex flex-col bg-white dark:bg-[#1f2937] rounded-[32px] overflow-hidden border border-gray-200/80 dark:border-gray-700 shadow-sm hover:shadow-md transition-all">
       {/* Seller Header */}
-      <div className="p-5 sm:p-6 pb-4 border-b border-gray-100 flex items-center justify-between gap-3 bg-gradient-to-r from-white via-[#f9fffb] to-white">
+      <div className="p-4 sm:p-5 pb-3 flex items-center justify-between gap-3">
         <Link
           to={sellerUrl}
-          className="flex items-center gap-3 min-w-0 group/seller hover:opacity-90 transition"
+          className="flex items-center gap-3 min-w-0 hover:opacity-90 transition"
         >
-          <div className="relative">
-            <div className="h-12 w-12 rounded-full bg-[#00a651] text-white flex items-center justify-center text-base font-black shadow-md border-2 border-white">
-              {firstName.charAt(0).toUpperCase()}
-            </div>
-            <span className="absolute -bottom-1 -right-1 block h-4 w-4 rounded-full bg-emerald-500 border-2 border-white"></span>
+          <div className="h-11 w-11 rounded-full bg-[#00a651] text-white flex items-center justify-center text-sm font-black shadow-sm">
+            {firstName.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <h3 className="text-base font-black text-gray-900 group-hover/seller:text-[#00a651] transition truncate">
-                {sellerName}
-              </h3>
-              <TrustBadge type="verified" text="Verified" />
-            </div>
-            <div className="flex items-center gap-2 text-[11px] font-bold text-gray-500">
-              <span>📍 {locationZone || "Campus"}</span>
+            <h3 className="text-sm font-black text-gray-900 dark:text-white truncate">
+              {sellerName}
+            </h3>
+            <div className="flex items-center gap-2 text-[11px] font-bold text-gray-500 dark:text-gray-400">
+              <span className="text-[#00a651]">✓ Verified</span>
               <span>•</span>
-              <span className="text-[#00a651] font-black">
-                {items.length} {items.length === 1 ? "Listing" : "Listings"}
-              </span>
+              <span>{items.length} {items.length === 1 ? "Listing" : "Listings"}</span>
             </div>
           </div>
         </Link>
 
-        {/* Price Range Pill */}
-        <div className="hidden sm:block text-right">
-          <p className="text-[9px] uppercase font-bold text-gray-400 tracking-wider">Store Range</p>
-          <p className="text-xs font-black text-[#00a651]">{priceDisplay}</p>
+        {/* Store Range */}
+        <div className="text-right">
+          <p className="text-[9px] uppercase font-bold text-gray-400 tracking-wider">
+            STORE RANGE
+          </p>
+          <p className="text-xs font-black text-[#00a651]">
+            {priceDisplay}
+          </p>
         </div>
       </div>
 
-      {/* Main Showcase Area */}
-      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-4">
+      {/* Main Content Area */}
+      <div className="px-4 pb-4 sm:px-5 sm:pb-5 flex-1 flex flex-col justify-between space-y-3.5">
         {/* Primary Featured Item */}
         <Link
           to={`/item/${primaryItem.id}`}
-          className="relative aspect-[16/10] sm:aspect-[4/3] rounded-[24px] overflow-hidden block bg-gray-50 border border-gray-100 group/image"
+          className="relative aspect-[16/10] sm:aspect-[4/3] rounded-[24px] overflow-hidden block bg-gray-100 dark:bg-gray-800 group"
         >
           <img
             src={primaryItem.imageUrl || "https://via.placeholder.com/600x400?text=No+Image"}
             alt={primaryItem.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover/image:scale-105"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
 
           {/* Badges Overlay */}
           <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-            <span className="bg-black/75 text-white px-2.5 py-1 rounded-xl text-[10px] font-bold uppercase backdrop-blur-sm">
-              {primaryItem.category || "Listing"}
+            <span className="bg-black/80 text-white px-2.5 py-1 rounded-xl text-[10px] font-black uppercase backdrop-blur-sm tracking-wider">
+              {primaryItem.category || "General"}
             </span>
-            {primaryItem.isFeatured && (
-              <span className="bg-[#ffb800] text-black px-2.5 py-1 rounded-xl text-[10px] font-black uppercase shadow-md">
-                ⭐ Featured
-              </span>
-            )}
             {(primaryItem.videoUrl || (primaryItem.media && primaryItem.media.some((m) => m.type === "video"))) && (
-              <span className="bg-red-600 text-white px-2.5 py-1 rounded-xl text-[10px] font-black uppercase shadow-md flex items-center gap-1">
-                <span>▶</span> Video Demo
+              <span className="bg-red-600 text-white px-2 py-1 rounded-xl text-[9px] font-black uppercase shadow-sm">
+                ▶ Video
               </span>
             )}
           </div>
 
           {/* Price Pill */}
           <div className="absolute top-3 right-3">
-            <div className="bg-[#00a651] text-[#ffb800] px-3 py-1 rounded-xl shadow-lg">
-              <span className="font-black text-xs">
+            <div className="bg-[#00a651] text-white px-3 py-1 rounded-xl shadow-md">
+              <span className="font-black text-xs text-white">
                 KSh {Number(primaryItem.price || 0).toLocaleString()}
               </span>
             </div>
           </div>
-
-          {/* Title Banner */}
-          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-3 pt-6 text-white">
-            <p className="text-xs font-bold truncate">
-              {primaryItem.title}
-            </p>
-          </div>
         </Link>
 
-        {/* Secondary Thumbnail Items if Seller has more than 1 item */}
+        {/* Secondary Thumbnail Items */}
         {otherItems.length > 0 && (
-          <div className="space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
-              More from this seller:
+          <div className="space-y-1">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              MORE FROM THIS SELLER:
             </p>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
               {otherItems.map((subItem) => (
                 <Link
                   key={subItem.id}
                   to={`/item/${subItem.id}`}
-                  className="group/sub relative aspect-square rounded-2xl overflow-hidden bg-gray-100 border border-gray-200/70 hover:border-[#00a651] transition"
+                  className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex-shrink-0 group"
                   title={subItem.title}
                 >
                   <img
-                    src={subItem.imageUrl || "https://via.placeholder.com/200x200?text=No+Image"}
+                    src={subItem.imageUrl || "https://via.placeholder.com/150"}
                     alt={subItem.title}
-                    className="w-full h-full object-cover group-hover/sub:scale-110 transition duration-300"
+                    className="w-full h-full object-cover group-hover:scale-105 transition"
                   />
-                  <div className="absolute inset-x-0 bottom-0 bg-black/70 px-1 py-0.5 text-center">
-                    <span className="text-[9px] font-black text-[#ffb800] truncate block">
-                      KSh {Number(subItem.price || 0).toLocaleString()}
+                  <div className="absolute inset-x-0 bottom-0 bg-black/75 py-0.5 text-center">
+                    <span className="text-[8px] font-black text-[#ffb800] truncate block px-0.5">
+                      {Number(subItem.price || 0).toLocaleString()}
                     </span>
                   </div>
                 </Link>
               ))}
-
-              {remainingCount > 0 && (
-                <Link
-                  to={sellerUrl}
-                  className="aspect-square rounded-2xl bg-green-50 border border-green-200 flex flex-col items-center justify-center p-1 text-center hover:bg-[#00a651] hover:text-white transition group/more text-[#00a651]"
-                >
-                  <span className="text-xs font-black">+{remainingCount}</span>
-                  <span className="text-[8px] font-bold uppercase">More</span>
-                </Link>
-              )}
             </div>
-          </div>
-        )}
-
-        {/* Category tags */}
-        {sellerCategories.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {sellerCategories.map((cat) => (
-              <span
-                key={cat}
-                className="text-[9px] font-bold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg uppercase"
-              >
-                {cat}
-              </span>
-            ))}
           </div>
         )}
 
@@ -192,16 +145,16 @@ export default function SellerBundleCard({ bundle }) {
         <div className="pt-2 grid grid-cols-2 gap-2">
           <Link
             to={sellerUrl}
-            className="w-full text-center bg-[#f9fffb] hover:bg-green-50 text-[#00a651] border border-green-200 py-3 rounded-2xl text-[11px] font-black uppercase tracking-wider transition shadow-sm active:scale-95 flex items-center justify-center"
+            className="w-full text-center bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition shadow-sm active:scale-95 flex items-center justify-center"
           >
-            All Items ({items.length})
+            ALL ITEMS ({items.length})
           </Link>
 
           <button
             onClick={handleWhatsAppClick}
-            className="w-full bg-[#00a651] hover:bg-emerald-600 text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5"
+            className="w-full bg-[#00a651] hover:bg-emerald-600 text-white py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition shadow-sm active:scale-95 flex items-center justify-center"
           >
-            <span>💬</span> WhatsApp
+            WHATSAPP
           </button>
         </div>
       </div>

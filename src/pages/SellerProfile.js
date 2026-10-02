@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { db } from "../firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
-import ItemCard from "../components/ItemCard";
 import SellerRatingModal from "../components/SellerRatingModal";
-import TrustBadge from "../components/TrustBadge";
 
 export default function SellerProfile() {
   const { sellerId } = useParams();
   const { user } = useAuth();
+  const navigate = useNavigate();
+
   const [sellerItems, setSellerItems] = useState([]);
   const [sellerName, setSellerName] = useState("");
   const [sellerPhone, setSellerPhone] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isFollowing, setIsFollowing] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -111,258 +113,261 @@ export default function SellerProfile() {
     };
   }, [sellerId]);
 
-  const isOwnProfile = user && user.uid === sellerId;
-  const hasUserReviewed = user && reviews.some((r) => r.reviewerId === user.uid);
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${sellerName} on SokoHub`,
+          text: `Check out ${sellerName}'s items on SokoHub Meru:`,
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.log("Share skipped");
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert("🔗 Seller storefront link copied to clipboard!");
+    }
+  };
 
-  const avgRating =
-    reviews.length > 0
-      ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1)
-      : null;
+  const getCleanPhone = (phone) => {
+    let clean = String(phone || "").replace(/\D/g, "").trim();
+    if (clean.startsWith("0")) return "254" + clean.substring(1);
+    if (clean.startsWith("7") || clean.startsWith("1")) return "254" + clean;
+    return clean;
+  };
 
-  const initial = (sellerName || "S").trim().charAt(0).toUpperCase();
+  const filteredItems = sellerItems.filter((it) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (it.title || "").toLowerCase().includes(q) ||
+      (it.category || "").toLowerCase().includes(q)
+    );
+  });
 
   return (
-    <div className="min-h-screen bg-[#f9fffb] py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* Navigation Breadcrumbs */}
-        <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
-          <Link to="/" className="hover:text-[#00a651] transition">Home</Link>
-          <span>/</span>
-          <span className="text-[#00a651]">Seller Storefront</span>
-          <span>/</span>
-          <span className="text-gray-700">{sellerName || "Seller"}</span>
-        </nav>
+    <div className="min-h-screen bg-[#f9fffb] dark:bg-[#111827] pb-24">
+      {/* Top Green Bar */}
+      <div className="bg-[#00a651] text-white px-4 py-4 sm:px-6 md:px-12 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-1 rounded-full hover:bg-white/10 transition"
+            title="Go Back"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </button>
+          <h1 className="text-lg sm:text-xl font-black tracking-tight truncate">
+            {sellerName || "Seller Storefront"}
+          </h1>
+        </div>
 
-        {loading ? (
-          <div className="py-20 text-center">
-            <div className="w-12 h-12 border-4 border-[#00a651] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Loading seller profile...</p>
+        <div className="flex items-center gap-3">
+          {/* Share Button */}
+          <button
+            onClick={handleShare}
+            className="p-1.5 rounded-full hover:bg-white/10 text-white transition"
+            title="Share Storefront"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-12 py-6 space-y-6">
+        {/* Seller Info Card */}
+        <div className="rounded-[24px] bg-white dark:bg-[#1f2937] p-5 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <h2 className="text-xl font-black text-gray-900 dark:text-white">
+              {sellerName || "Campus Seller"}
+            </h2>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="rounded-lg bg-green-100 text-[#00a651] px-2.5 py-0.5 text-xs font-bold">
+                ✓ Verified Seller
+              </span>
+              <span className="rounded-lg bg-emerald-50 text-emerald-800 px-2.5 py-0.5 text-xs font-bold">
+                Main Campus
+              </span>
+            </div>
+            <p className="text-xs font-bold text-gray-500 dark:text-gray-400 pt-1">
+              {sellerItems.length} Active Listing(s)
+            </p>
           </div>
-        ) : (
-          <div className="space-y-8">
-            {/* Header Card */}
-            <div className="rounded-[32px] border border-gray-100 bg-white p-6 sm:p-8 shadow-soft">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-                <div className="flex items-center gap-5">
-                  <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-green-100 border-4 border-[#00a651] flex items-center justify-center text-2xl sm:text-3xl font-black text-[#00a651] shadow-inner">
-                    {initial}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h1 className="text-xl sm:text-2xl font-black text-gray-900">
-                        {sellerName || "Campus Seller"}
-                      </h1>
-                      <TrustBadge type="verified" text="Verified Seller" />
-                    </div>
-                    <div className="mt-1 flex items-center gap-3">
-                      {avgRating ? (
-                        <span className="text-xs font-bold text-amber-500 bg-amber-50 px-2.5 py-1 rounded-full">
-                          ★ {avgRating} ({reviews.length} {reviews.length === 1 ? "review" : "reviews"})
-                        </span>
-                      ) : (
-                        <span className="text-xs font-medium text-gray-400">
-                          New Comrade Seller
-                        </span>
-                      )}
-                      <span className="text-xs text-gray-400">•</span>
-                      <span className="text-xs font-bold text-gray-500">
-                        {sellerItems.length} {sellerItems.length === 1 ? "Listing" : "Listings"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
 
-                {!isOwnProfile && (
-                  <div className="flex items-center gap-3 flex-wrap">
-                    {sellerPhone && (
-                      <a
-                        href={`https://wa.me/${(() => {
-                          let c = sellerPhone.replace(/\D/g, "").trim();
-                          if (c.startsWith("0")) return "254" + c.substring(1);
-                          if (c.startsWith("7") || c.startsWith("1")) return "254" + c;
-                          return c;
-                        })()}?text=${encodeURIComponent(`Hi ${sellerName || "Seller"}, I'm browsing your SokoHub store and would like to inquire about your items.`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="rounded-2xl bg-[#00a651] hover:bg-emerald-600 text-white px-5 py-3.5 text-xs font-black uppercase tracking-widest shadow-md transition active:scale-95 flex items-center gap-1.5"
-                      >
-                        <span>💬</span> Chat
-                      </a>
-                    )}
-                    {hasUserReviewed ? (
-                      <button
-                        disabled
-                        className="cursor-not-allowed rounded-2xl bg-gray-100 px-5 py-3.5 text-xs font-black uppercase tracking-wider text-gray-400"
-                      >
-                        ✓ Reviewed
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          if (!user) {
-                            alert("Please log in to leave a review.");
-                            return;
-                          }
-                          setIsModalOpen(true);
-                        }}
-                        className="rounded-2xl bg-[#ffb800] hover:bg-yellow-400 text-black px-6 py-3.5 text-xs font-black uppercase tracking-widest shadow-md transition active:scale-95"
-                      >
-                        ★ Rate Seller
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsFollowing(!isFollowing)}
+              className={`rounded-2xl px-5 py-2.5 text-xs font-black transition-all ${
+                isFollowing
+                  ? "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                  : "bg-[#00a651] hover:bg-emerald-600 text-white shadow-sm"
+              }`}
+            >
+              {isFollowing ? "✓ Following" : "Follow Seller"}
+            </button>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="rounded-2xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-5 py-2.5 text-xs font-bold transition-all shadow-sm"
+            >
+              Rate Seller
+            </button>
+          </div>
+        </div>
+
+        {/* Search Bar */}
+        <div>
+          <div className="relative flex items-center bg-white dark:bg-[#1f2937] rounded-2xl border border-gray-300 dark:border-gray-700 p-2 shadow-sm">
+            <span className="pl-3 pr-2 text-gray-400 text-sm">🔍</span>
+            <input
+              type="text"
+              placeholder={`Search in ${sellerName ? sellerName + "'s" : "seller's"} shop...`}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-transparent text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200 outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Items Section */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-black text-[#00a651] dark:text-[#22c55e]">
+            Items Listed by Seller
+          </h3>
+
+          {loading ? (
+            <div className="py-12 text-center">
+              <div className="w-8 h-8 border-4 border-[#00a651] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+              <p className="text-xs font-bold text-gray-400">Loading products...</p>
             </div>
-
-            {/* Section 1: Active Listings */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 px-2">
-                <h2 className="text-xl sm:text-2xl font-black text-[#00a651] uppercase italic tracking-tighter">
-                  Active Listings ({sellerItems.length})
-                </h2>
-                <div className="h-1 flex-1 bg-[#ffb800] rounded-full opacity-30"></div>
-              </div>
-
-              {sellerItems.length === 0 ? (
-                <div className="rounded-[32px] border border-dashed border-gray-200 bg-white p-12 text-center shadow-soft">
-                  <div className="w-16 h-16 rounded-full bg-green-50 text-2xl flex items-center justify-center mx-auto mb-3">
-                    📦
-                  </div>
-                  <h3 className="text-base font-bold text-gray-900">No active listings</h3>
-                  <p className="text-xs text-gray-500 mt-1">This seller currently has no items listed for sale.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {sellerItems.map((item) => (
-                    <ItemCard key={item.id} item={item} isSellerView={true} />
-                  ))}
-                </div>
-              )}
+          ) : filteredItems.length === 0 ? (
+            <div className="py-12 text-center text-xs text-gray-500">
+              No items match your search in this store.
             </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {filteredItems.map((item) => {
+                const phone = item.sellerPhone || item.whatsapp || item.phone || sellerPhone;
+                const cleanPhone = getCleanPhone(phone);
+                const waUrl = cleanPhone
+                  ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(
+                      `Hi ${sellerName}, I am interested in '${item.title}' on SokoHub.`
+                    )}`
+                  : null;
 
-            {/* Section 2: Customer Reviews */}
-            <div className="rounded-[32px] border border-gray-100 bg-white p-6 sm:p-8 shadow-soft space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg sm:text-xl font-black text-gray-900">
-                    Verified Buyer Reviews
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    Feedback & media proof from Meru University students and buyers
-                  </p>
-                </div>
-                {avgRating && (
-                  <div className="text-right">
-                    <p className="text-xl font-black text-amber-500">★ {avgRating}</p>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{reviews.length} total</p>
-                  </div>
-                )}
-              </div>
-
-              {reviews.length === 0 ? (
-                <div className="rounded-2xl bg-gray-50/70 p-6 text-center text-xs text-gray-500 font-medium">
-                  No buyer reviews yet. Be the first comrade to leave a review after purchasing!
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {reviews.map((rev) => {
-                    const reviewMedia = Array.isArray(rev.media) && rev.media.length > 0
-                      ? rev.media
-                      : [
-                          ...(Array.isArray(rev.images) ? rev.images.map(url => ({ url, type: "image" })) : []),
-                          ...(rev.imageUrl && !Array.isArray(rev.images) ? [{ url: rev.imageUrl, type: "image" }] : []),
-                          ...(rev.videoUrl ? [{ url: rev.videoUrl, type: "video" }] : [])
-                        ];
-
-                    return (
-                      <div key={rev.id} className="rounded-2xl bg-[#f9fffb] border border-green-100/60 p-5 text-sm space-y-3 flex flex-col justify-between">
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <div className="h-7 w-7 rounded-full bg-green-100 text-[#00a651] text-xs font-black flex items-center justify-center">
-                                {(rev.reviewerName || "U").charAt(0).toUpperCase()}
-                              </div>
-                              <div>
-                                <span className="font-bold text-gray-800 text-xs block">
-                                  {rev.reviewerName || "Verified Buyer"}
-                                </span>
-                                {rev.itemTitle && (
-                                  <span className="text-[10px] text-gray-400 truncate max-w-[150px] block">
-                                    Bought: {rev.itemTitle}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            <span className="text-amber-500 font-bold text-sm tracking-widest">
-                              {"★".repeat(rev.rating || 5)}
-                            </span>
-                          </div>
-
-                          {rev.comment && (
-                            <p className="text-xs text-gray-600 leading-relaxed pt-1">
-                              "{rev.comment}"
-                            </p>
-                          )}
-                        </div>
-
-                        {/* Buyer Media Proof (Photos & Videos) */}
-                        {reviewMedia.length > 0 && (
-                          <div className="pt-2 border-t border-green-100/50 space-y-2">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider flex items-center gap-1">
-                              <span>📸</span> Buyer Media Proof ({reviewMedia.length})
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                              {reviewMedia.map((m, mIdx) => (
-                                m.type === "video" ? (
-                                  <div key={mIdx} className="w-full rounded-xl overflow-hidden bg-black shadow-sm">
-                                    <video
-                                      src={m.url}
-                                      controls
-                                      playsInline
-                                      className="w-full max-h-48 object-contain"
-                                    />
-                                  </div>
-                                ) : (
-                                  <a
-                                    key={mIdx}
-                                    href={m.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="relative w-16 h-16 rounded-xl overflow-hidden border border-gray-200 hover:border-[#00a651] hover:scale-105 transition-all shadow-sm block bg-white"
-                                    title="View full image"
-                                  >
-                                    <img
-                                      src={m.url}
-                                      alt="Buyer product proof"
-                                      className="w-full h-full object-cover"
-                                    />
-                                  </a>
-                                )
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                return (
+                  <div
+                    key={item.id}
+                    className="flex flex-col bg-white dark:bg-[#1f2937] rounded-[24px] overflow-hidden border border-gray-200 dark:border-gray-700 p-3 shadow-sm hover:shadow-md transition-all justify-between"
+                  >
+                    <Link to={`/item/${item.id}`} className="block space-y-2">
+                      <div className="aspect-square rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+                        <img
+                          src={item.imageUrl || "https://via.placeholder.com/300"}
+                          alt={item.title}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
 
-            {/* Rating Modal */}
-            {isModalOpen && (
-              <SellerRatingModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                sellerId={sellerId}
-                sellerName={sellerName}
-                sellerItems={sellerItems}
-              />
-            )}
+                      <div>
+                        <h4 className="text-xs font-black text-gray-900 dark:text-white line-clamp-1">
+                          {item.title}
+                        </h4>
+                        <p className="text-xs font-black text-[#00a651] mt-0.5">
+                          KSh {Number(item.price || 0).toLocaleString()}
+                        </p>
+                      </div>
+                    </Link>
+
+                    {/* WhatsApp and Call Buttons */}
+                    <div className="grid grid-cols-2 gap-1.5 pt-3 mt-auto">
+                      {waUrl ? (
+                        <a
+                          href={waUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full text-center rounded-xl bg-[#00a651] hover:bg-emerald-600 text-white py-2 text-[10px] font-black uppercase transition shadow-sm"
+                        >
+                          WHATSAPP
+                        </a>
+                      ) : (
+                        <button
+                          disabled
+                          className="w-full text-center rounded-xl bg-gray-200 text-gray-400 py-2 text-[10px] font-black uppercase"
+                        >
+                          WHATSAPP
+                        </button>
+                      )}
+
+                      {phone ? (
+                        <a
+                          href={`tel:${phone}`}
+                          className="w-full text-center rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 text-gray-700 dark:text-gray-300 py-2 text-[10px] font-black uppercase transition shadow-sm"
+                        >
+                          CALL
+                        </a>
+                      ) : (
+                        <button
+                          disabled
+                          className="w-full text-center rounded-xl border border-gray-200 bg-gray-100 text-gray-400 py-2 text-[10px] font-black uppercase"
+                        >
+                          CALL
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Customer Reviews Section */}
+        {reviews.length > 0 && (
+          <div className="rounded-[24px] bg-white dark:bg-[#1f2937] p-6 border border-gray-200 dark:border-gray-700 shadow-sm space-y-4">
+            <h3 className="text-base font-black text-gray-900 dark:text-white">
+              Customer Reviews ({reviews.length})
+            </h3>
+            <div className="space-y-3">
+              {reviews.map((rev) => (
+                <div
+                  key={rev.id}
+                  className="rounded-2xl bg-[#f9fffb] dark:bg-[#1a2e22] p-4 border border-green-100 dark:border-green-800 text-xs space-y-1.5"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-gray-800 dark:text-gray-200">
+                      {rev.reviewerName || "Verified Buyer"}
+                    </span>
+                    <span className="text-amber-500 font-black">
+                      {"★".repeat(rev.rating || 5)}
+                    </span>
+                  </div>
+                  {rev.comment && (
+                    <p className="text-gray-600 dark:text-gray-300">
+                      "{rev.comment}"
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
+
+      {/* Rating Modal */}
+      {isModalOpen && (
+        <SellerRatingModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          sellerId={sellerId}
+          sellerName={sellerName}
+          sellerItems={sellerItems}
+        />
+      )}
     </div>
   );
 }

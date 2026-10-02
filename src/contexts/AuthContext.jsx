@@ -13,6 +13,14 @@ import {
 } from "firebase/auth";
 import { doc, setDoc, getDoc, collection, getDocs, query, limit } from "firebase/firestore";
 
+// Known Administrator Emails (automatically recognized as Admin on login)
+export const ADMIN_EMAILS = [
+  "knjeru13@gmail.com",
+  "admin@sokohub.com",
+  "admin@unimart.com",
+  "kevin@sokohub.com",
+];
+
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
@@ -20,6 +28,12 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+
+  // Helper to check if an email is a recognized admin
+  const checkEmailIsAdmin = (email) => {
+    if (!email) return false;
+    return ADMIN_EMAILS.some((adm) => adm.toLowerCase() === email.trim().toLowerCase());
+  };
 
   // Check if any users exist (to assign first user as admin)
   const checkIfFirstUser = async () => {
@@ -147,12 +161,16 @@ export function AuthProvider({ children }) {
             const adminRef = doc(db, "admins", u.uid);
             const adminSnap = await getDoc(adminRef);
 
-            userIsAdmin = userData.isAdmin === true || adminSnap.exists();
+            userIsAdmin =
+              userData.isAdmin === true ||
+              adminSnap.exists() ||
+              checkEmailIsAdmin(u.email);
           } catch (error) {
             console.warn(
-              "Firestore access error, falling back to basic Auth profile:",
+              "Firestore access error, checking email admin status fallback:",
               error
             );
+            userIsAdmin = checkEmailIsAdmin(u.email);
           }
 
           if (isSubscribed) {

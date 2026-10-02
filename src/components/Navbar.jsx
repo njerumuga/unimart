@@ -1,86 +1,124 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import AdvertiseModal from "./AdvertiseModal";
 
-function Navbar() {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
+export default function Navbar() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [isAdModalOpen, setIsAdModalOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem("soko_theme") === "dark";
+  });
 
-    const handleLogout = async () => {
-        try {
-            await logout();
-            navigate("/");
-        } catch (error) {
-            console.error("Logout failed:", error);
-        }
-    };
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("soko_theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("soko_theme", "light");
+    }
+  }, [isDarkMode]);
 
-    // Helper to resolve user's display name cleanly
-    const getFirstName = () => {
-        if (!user) return "Profile";
-        const fullName = user.displayName || user.name || user.username || user.email?.split("@")[0];
-        return fullName ? fullName.split(" ")[0] : "Profile";
-    };
+  const toggleDarkMode = () => {
+    setIsDarkMode((prev) => !prev);
+  };
 
-    return (
-        <nav className="sticky top-0 z-50 bg-[#00a651] text-white shadow-lg border-b-4 border-[#ffb800]">
-            <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
-                {/* Logo Section */}
-                <Link to="/" className="flex items-center gap-2 transition hover:opacity-90">
-                    <div className="rounded-xl bg-white p-1 shadow-sm">
-                        <div className="rounded-lg bg-[#ffb800] px-2 py-0.5 text-[10px] font-black text-black md:px-3 md:py-1 md:text-xs">
-                            SH
-                        </div>
-                    </div>
-                    <div className="flex flex-col leading-none">
-                        <h1 className="text-lg font-black tracking-tighter text-white md:text-2xl">
-                            Soko<span className="text-[#ffb800]">Hub</span>
-                        </h1>
-                        <p className="hidden text-[8px] font-bold uppercase tracking-widest text-green-100 sm:block">
-                            Student Marketplace
-                        </p>
-                    </div>
-                </Link>
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
-                {/* Actions Section */}
-                <div className="flex items-center gap-3 md:gap-5">
-                    <Link 
-                        to="/post" 
-                        className="text-[10px] font-black uppercase tracking-wider hover:text-[#ffb800] md:text-xs transition-colors"
-                    >
-                        + Sell Item
-                    </Link>
-                    
-                    <Link
-                        to="/advertise"
-                        className="rounded-full bg-[#ffb800] px-3.5 py-1.5 text-[10px] font-black uppercase text-black transition hover:scale-105 hover:bg-yellow-400 md:px-5 md:py-2 md:text-xs shadow-sm"
-                    >
-                        Advertise
-                    </Link>
-
-                    <div className="h-4 w-[1px] bg-white/20 hidden md:block"></div>
-
-                    {user ? (
-                        <div className="flex items-center gap-3 md:gap-4">
-                            <Link to="/profile" className="text-[10px] font-black text-[#ffb800] md:text-xs hover:underline">
-                                {getFirstName()}
-                            </Link>
-                            <button 
-                                onClick={handleLogout} 
-                                className="text-[8px] font-black uppercase text-green-100 md:text-[10px] hover:text-white transition-colors"
-                            >
-                                Logout
-                            </button>
-                        </div>
-                    ) : (
-                        <Link to="/login" className="text-[10px] font-black hover:text-[#ffb800] md:text-xs transition-colors">
-                            Login
-                        </Link>
-                    )}
-                </div>
+  return (
+    <>
+      <nav className="sticky top-0 z-40 bg-[#00a651] text-white shadow-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
+          {/* Logo Section */}
+          <Link to="/" className="flex items-center gap-2.5 transition hover:opacity-95">
+            <div className="rounded-lg bg-white p-1 shadow-sm flex items-center justify-center">
+              <div className="rounded bg-[#ffb800] px-2 py-0.5 text-[10px] font-black text-black">
+                SokoHub
+              </div>
             </div>
-        </nav>
-    );
-}
+            <div className="flex flex-col leading-none">
+              <span className="text-lg font-black tracking-tight text-white md:text-xl">
+                Soko<span className="text-[#ffb800]">Hub</span>
+              </span>
+              <span className="text-[7px] md:text-[8px] font-black uppercase tracking-widest text-green-100">
+                STUDENT MARKETPLACE
+              </span>
+            </div>
+          </Link>
 
-export default Navbar;
+          {/* Right Action Icons & Buttons */}
+          <div className="flex items-center gap-3 md:gap-4">
+            {/* Advertise Button (Yellow pill with megaphone icon) */}
+            <button
+              onClick={() => setIsAdModalOpen(true)}
+              className="flex items-center gap-1.5 rounded-full bg-[#ffb800] hover:bg-yellow-400 text-black px-3.5 py-1.5 text-[10px] md:text-xs font-black uppercase tracking-wider transition-all shadow-sm active:scale-95"
+            >
+              <span>📢</span>
+              <span>ADVERTISE</span>
+            </button>
+
+            {/* Dark Mode Toggle (Moon) */}
+            <button
+              onClick={toggleDarkMode}
+              title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              className="p-1.5 rounded-full hover:bg-white/10 text-white transition active:scale-90"
+            >
+              <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+              </svg>
+            </button>
+
+            {/* Desktop Auth Links */}
+            <div className="hidden md:flex items-center gap-4 pl-2 border-l border-white/20">
+              <Link
+                to="/post"
+                className="text-xs font-black uppercase hover:text-[#ffb800] transition"
+              >
+                + Post Item
+              </Link>
+
+              {user ? (
+                <div className="flex items-center gap-3">
+                  <Link
+                    to="/profile"
+                    className="text-xs font-black text-[#ffb800] hover:underline"
+                  >
+                    {user.displayName?.split(" ")[0] || "Profile"}
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="text-[10px] font-bold uppercase text-green-100 hover:text-white"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  to="/login"
+                  className="text-xs font-black uppercase hover:text-[#ffb800] transition"
+                >
+                  Login
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Advertise Modal */}
+      <AdvertiseModal
+        isOpen={isAdModalOpen}
+        onClose={() => setIsAdModalOpen(false)}
+      />
+    </>
+  );
+}

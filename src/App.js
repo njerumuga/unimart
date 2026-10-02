@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import BottomNav from "./components/BottomNav";
 import Home from "./pages/Home";
 import PostItem from "./pages/PostItem";
 import ItemDetails from "./pages/ItemDetails";
@@ -16,9 +17,9 @@ import Advertise from "./pages/Advertise";
 function App() {
     return (
         <Router>
-            <div className="app-container">
+            <div className="app-container min-h-screen flex flex-col bg-[#f9fffb] dark:bg-[#111827]">
                 <Navbar />
-                <main className="content">
+                <main className="content flex-1">
                     <Routes>
                         {/* Public routes */}
                         <Route path="/" element={<Home />} />
@@ -37,6 +38,7 @@ function App() {
                     </Routes>
                 </main>
                 <Footer />
+                <BottomNav />
             </div>
         </Router>
     );

@@ -13,23 +13,17 @@ export default function Home() {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [selectedLocation, setSelectedLocation] = useState("All");
     const [searchQuery, setSearchQuery] = useState("");
-    const [viewMode, setViewMode] = useState("bundled"); // "bundled" by default or "single"
-    const [showSecretBtn, setShowSecretBtn] = useState(false); 
+    const [viewMode, setViewMode] = useState("bundled"); // "bundled" (By Seller) or "single" (All Items)
     const [loading, setLoading] = useState(true);
     const { isAdmin } = useAuth();
 
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (e.shiftKey && (e.key === "A" || e.key === "a")) {
-                if (isAdmin) {
-                    setShowSecretBtn((prev) => !prev);
-                }
-            }
-        };
-
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [isAdmin]);
+    const quickChips = [
+        { label: "🔥 Laptops", category: "Laptops" },
+        { label: "📱 Phones", category: "Phones" },
+        { label: "👕 Clothes", category: "Clothes" },
+        { label: "🏠 Hostels", category: "Hostels" },
+        { label: "📚 Notes", category: "Notes" },
+    ];
 
     useEffect(() => {
         const q = query(
@@ -41,7 +35,6 @@ export default function Home() {
             q,
             (snap) => {
                 const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-                // Strictly enforce approval check for non-admin users
                 const visibleItems = isAdmin 
                     ? arr 
                     : arr.filter((i) => i.isApproved === true);
@@ -101,40 +94,27 @@ export default function Home() {
     }, [filteredItems]);
 
     return (
-        <div className="min-h-screen bg-[#f9fffb] pb-24 relative">
-            {showSecretBtn && isAdmin && (
-                <Link 
-                    to="/admin" 
-                    className="fixed bottom-10 right-10 z-[100] animate-bounce rounded-full bg-red-600 px-8 py-5 font-black uppercase tracking-widest text-white shadow-[0_20px_50px_rgba(220,38,38,0.5)] hover:bg-black transition-all"
-                >
-                    ⚠️ ADMIN DASHBOARD
-                </Link>
-            )}
-
-            {/* HERO */}
-            <header className="relative bg-[#00a651] pt-10 pb-20 px-4 border-b-[6px] border-[#ffb800] overflow-hidden">
-                <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
-                <div className="relative max-w-5xl mx-auto text-center space-y-4">
-                    <div className="inline-flex items-center gap-2 rounded-full bg-white/20 backdrop-blur-md px-4 py-1.5 text-xs font-black uppercase tracking-widest text-white border border-white/30">
-                        <span>🎓 Meru University Marketplace</span>
-                    </div>
-                    <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tighter uppercase italic leading-none">
-                        The Meru <span className="text-[#ffb800]">Marketplace.</span>
+        <div className="min-h-screen bg-[#f9fffb] dark:bg-[#111827] pb-24">
+            {/* Top Green Hero Banner */}
+            <header className="bg-[#00a651] pt-6 pb-12 px-4 sm:px-6 md:px-12 text-center text-white space-y-4">
+                <div className="max-w-3xl mx-auto space-y-3">
+                    <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight uppercase">
+                        THE MERU MARKETPLACE.
                     </h1>
                     <p className="max-w-xl mx-auto text-xs sm:text-sm text-green-50 font-medium">
-                        Buy, sell, and trade electronics, household goods, books, and services across Meru campus. Safe. Local. Verified.
+                        Buy, sell, and trade electronics, hostel goods, books, and services across Meru campus. Safe. Local. Verified.
                     </p>
 
-                    {/* Search Bar in Hero */}
+                    {/* Search Bar */}
                     <div className="max-w-xl mx-auto pt-2">
-                        <div className="relative flex items-center bg-white rounded-2xl shadow-xl overflow-hidden p-1.5 border-2 border-transparent focus-within:border-[#ffb800]">
-                            <span className="pl-3 pr-2 text-gray-400 text-lg">🔍</span>
+                        <div className="relative flex items-center bg-white rounded-full shadow-lg overflow-hidden p-1.5">
+                            <span className="pl-3.5 pr-2 text-gray-400 text-base">🔍</span>
                             <input
                                 type="text"
                                 placeholder="Search phones, laptops, hostels, notes..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full py-2 px-2 text-xs sm:text-sm font-bold text-gray-800 outline-none placeholder-gray-400"
+                                className="w-full py-2 px-1 text-xs sm:text-sm font-semibold text-gray-800 outline-none placeholder-gray-400"
                             />
                             {searchQuery && (
                                 <button
@@ -146,21 +126,38 @@ export default function Home() {
                             )}
                         </div>
                     </div>
+
+                    {/* Quick Category Chips in Hero */}
+                    <div className="flex items-center justify-center gap-2 overflow-x-auto no-scrollbar pt-2">
+                        {quickChips.map((chip) => (
+                            <button
+                                key={chip.category}
+                                onClick={() => setSelectedCategory(chip.category)}
+                                className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-black transition-all ${
+                                    selectedCategory === chip.category
+                                        ? "bg-white text-[#00a651] shadow-md scale-105"
+                                        : "bg-white/20 hover:bg-white/30 text-white"
+                                }`}
+                            >
+                                {chip.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </header>
 
-            {/* FILTERS SECTION */}
-            <div className="sticky top-[68px] z-40 -mt-6 mb-10 max-w-6xl mx-auto px-4 space-y-3">
-                {/* Category Bar */}
-                <div className="bg-white border-2 border-[#00a651] rounded-[24px] p-2 shadow-lg flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth">
+            {/* Category Selectors & Controls */}
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 -mt-5 space-y-4">
+                {/* Horizontal Category Selector */}
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar bg-white dark:bg-[#1f2937] p-2 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
                     {["All", ...categories].map((c) => (
                         <button
                             key={c}
                             onClick={() => setSelectedCategory(c)}
-                            className={`whitespace-nowrap rounded-[18px] px-6 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all ${
+                            className={`whitespace-nowrap rounded-xl px-4 py-2 text-xs font-black transition-all ${
                                 selectedCategory === c
-                                    ? "bg-[#00a651] text-white shadow-md scale-105"
-                                    : "text-gray-400 hover:text-[#00a651] hover:bg-green-50"
+                                    ? "bg-[#00a651] text-white shadow-sm"
+                                    : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200"
                             }`}
                         >
                             {c}
@@ -168,53 +165,47 @@ export default function Home() {
                     ))}
                 </div>
 
-                {/* Location Filter & View Mode Bar */}
-                <div className="flex flex-wrap items-center justify-between gap-3 px-2 bg-white/80 backdrop-blur-md p-3 rounded-2xl border border-gray-100 shadow-sm">
-                    <div className="flex items-center gap-3">
-                        <p className="text-xs font-bold text-gray-700">
-                            {viewMode === "bundled" 
-                                ? `${sellerBundles.length} ${sellerBundles.length === 1 ? "Seller Store" : "Seller Stores"} (${filteredItems.length} items)`
-                                : `${filteredItems.length} ${filteredItems.length === 1 ? "Listing" : "Listings"} found`
-                            }
-                        </p>
-                    </div>
+                {/* View Mode & Area Controls Bar */}
+                <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+                    <p className="text-xs font-bold text-gray-600 dark:text-gray-400">
+                        {viewMode === "bundled"
+                            ? `${sellerBundles.length} Seller Stores (${filteredItems.length} items)`
+                            : `${filteredItems.length} Listings found`}
+                    </p>
 
-                    <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-2 flex-wrap">
                         {/* View Toggle */}
-                        <div className="flex items-center bg-gray-100 p-1 rounded-xl">
+                        <div className="flex items-center bg-gray-200 dark:bg-gray-800 p-1 rounded-xl">
                             <button
                                 onClick={() => setViewMode("bundled")}
-                                className={`px-3 py-1 text-[11px] font-black uppercase rounded-lg transition ${
+                                className={`px-3 py-1.5 text-[11px] font-black uppercase rounded-lg transition ${
                                     viewMode === "bundled"
                                         ? "bg-[#00a651] text-white shadow-sm"
-                                        : "text-gray-500 hover:text-gray-900"
+                                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900"
                                 }`}
-                                title="Group by Seller"
                             >
-                                👥 By Seller
+                                👥 BY SELLER
                             </button>
                             <button
                                 onClick={() => setViewMode("single")}
-                                className={`px-3 py-1 text-[11px] font-black uppercase rounded-lg transition ${
+                                className={`px-3 py-1.5 text-[11px] font-black uppercase rounded-lg transition ${
                                     viewMode === "single"
                                         ? "bg-[#00a651] text-white shadow-sm"
-                                        : "text-gray-500 hover:text-gray-900"
+                                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900"
                                 }`}
-                                title="Show all items individually"
                             >
-                                📦 All Items
+                                📦 ALL ITEMS
                             </button>
                         </div>
 
                         {/* Location Select */}
-                        <div className="flex items-center gap-1.5">
-                            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Area:</span>
+                        <div className="relative">
                             <select
                                 value={selectedLocation}
                                 onChange={(e) => setSelectedLocation(e.target.value)}
-                                className="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 outline-none focus:border-[#00a651] shadow-sm"
+                                className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1f2937] px-3 py-1.5 text-xs font-black text-gray-700 dark:text-gray-300 outline-none shadow-sm"
                             >
-                                <option value="All">All Locations</option>
+                                <option value="All">AREA: ALL</option>
                                 {locations.map((loc) => (
                                     <option key={loc} value={loc}>
                                         📍 {loc}
@@ -226,30 +217,21 @@ export default function Home() {
                 </div>
             </div>
 
-            {/* MAIN CONTENT */}
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
-                <div className="flex items-center gap-4 mb-8 px-2">
-                    <h2 className="text-2xl font-black text-[#00a651] uppercase italic tracking-tighter">
-                       {selectedCategory === "All" 
-                           ? (viewMode === "bundled" ? "Campus Seller Stores" : "Featured Listings") 
-                           : `${selectedCategory} ${viewMode === "bundled" ? "Sellers" : "Listings"}`}
-                    </h2>
-                    <div className="h-1 flex-1 bg-[#ffb800] rounded-full opacity-30"></div>
-                </div>
-
+            {/* Main Content */}
+            <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
                 {loading ? (
                     <div className="py-20 text-center">
-                        <div className="w-12 h-12 border-4 border-[#00a651] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                        <div className="w-10 h-10 border-4 border-[#00a651] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
                         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Loading campus listings...</p>
                     </div>
                 ) : filteredItems.length === 0 ? (
-                    <div className="rounded-[32px] bg-white p-12 text-center border border-gray-100 shadow-soft space-y-4 max-w-lg mx-auto">
-                        <div className="w-16 h-16 rounded-full bg-green-50 text-2xl flex items-center justify-center mx-auto">
+                    <div className="rounded-[32px] bg-white dark:bg-[#1f2937] p-12 text-center border border-gray-100 dark:border-gray-800 shadow-sm space-y-4 max-w-md mx-auto">
+                        <div className="w-14 h-14 rounded-full bg-green-50 text-2xl flex items-center justify-center mx-auto">
                             🔍
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900">No Listings Found</h3>
+                        <h3 className="text-base font-bold text-gray-900 dark:text-white">No Listings Found</h3>
                         <p className="text-xs text-gray-500">
-                            Try adjusting your search query, selecting another category, or choosing "All Locations".
+                            Try selecting another category or area zone.
                         </p>
                         <div className="pt-2 flex justify-center gap-3">
                             <button
@@ -258,28 +240,28 @@ export default function Home() {
                                     setSelectedLocation("All");
                                     setSearchQuery("");
                                 }}
-                                className="rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 text-xs font-black uppercase tracking-wider"
+                                className="rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 text-xs font-black uppercase"
                             >
-                                Reset Filters
+                                Reset
                             </button>
                             <Link
                                 to="/post"
-                                className="rounded-2xl bg-[#00a651] hover:bg-emerald-600 text-white px-5 py-2.5 text-xs font-black uppercase tracking-wider shadow-sm"
+                                className="rounded-2xl bg-[#00a651] hover:bg-emerald-600 text-white px-5 py-2 text-xs font-black uppercase shadow-sm"
                             >
                                 Post Item
                             </Link>
                         </div>
                     </div>
                 ) : viewMode === "bundled" ? (
-                    /* Bundled by Seller Grid */
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    /* Bundled by Seller Grid (Image 5) */
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {sellerBundles.map((bundle) => (
                             <SellerBundleCard key={bundle.sellerId} bundle={bundle} />
                         ))}
                     </div>
                 ) : (
                     /* Flat Item Grid */
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {filteredItems.map((item) => (
                             <ItemCard key={item.id} item={item} />
                         ))}
