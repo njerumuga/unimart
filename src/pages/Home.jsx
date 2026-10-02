@@ -12,7 +12,8 @@ import AdvertiseModal from "../components/AdvertiseModal";
 
 export default function Home() {
     const [items, setItems] = useState([]);
-    const [banners, setBanners] = useState([]);
+    const [bannersFromBannersCollection, setBannersFromBannersCollection] = useState([]);
+    const [bannersFromItemsCollection, setBannersFromItemsCollection] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [selectedLocation, setSelectedLocation] = useState("All");
     const [searchQuery, setSearchQuery] = useState("");
@@ -30,7 +31,7 @@ export default function Home() {
         { label: "📚 Notes", category: "Notes" },
     ];
 
-    // Listen to items
+    // Listen to items (and extract banners stored in items collection so all users see them)
     useEffect(() => {
         const q = query(
             collection(db, "items"),
@@ -41,9 +42,22 @@ export default function Home() {
             q,
             (snap) => {
                 const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+                // 1. Extract active banner items for everyone (guests, regular users, and admins)
+                const bannerDocs = arr.filter(
+                    (i) => (i.isBanner === true || i.category === "AdBanner" || i.isFeaturedBanner === true) &&
+                           i.active !== false
+                );
+                setBannersFromItemsCollection(bannerDocs);
+
+                // 2. Extract regular product listings
+                const productDocs = arr.filter(
+                    (i) => !i.isBanner && i.category !== "AdBanner" && !i.isFeaturedBanner
+                );
                 const visibleItems = isAdmin 
-                    ? arr 
-                    : arr.filter((i) => i.isApproved === true && !i.isBanner);
+                    ? productDocs 
+                    : productDocs.filter((i) => i.isApproved === true);
+
                 setItems(visibleItems);
                 setLoading(false);
             },
@@ -55,7 +69,7 @@ export default function Home() {
         return () => unsub();
     }, [isAdmin]);
 
-    // Listen to active banners
+    // Listen to active banners collection
     useEffect(() => {
         let unsubBanners = () => {};
         try {
@@ -64,22 +78,10 @@ export default function Home() {
                 q,
                 (snap) => {
                     const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-                    if (list.length > 0) {
-                        setBanners(list);
-                    } else {
-                        // Check local storage backup
-                        try {
-                            const cached = JSON.parse(localStorage.getItem("sokohub_active_banners") || "[]");
-                            if (cached.length > 0) setBanners(cached);
-                        } catch (e) {}
-                    }
+                    setBannersFromBannersCollection(list);
                 },
                 (err) => {
-                    console.warn("Banners query error, checking local fallback:", err);
-                    try {
-                        const cached = JSON.parse(localStorage.getItem("sokohub_active_banners") || "[]");
-                        if (cached.length > 0) setBanners(cached);
-                    } catch (e) {}
+                    console.warn("Banners collection query note:", err);
                 }
             );
         } catch (err) {
@@ -87,6 +89,28 @@ export default function Home() {
         }
         return () => unsubBanners();
     }, []);
+
+    // Combine all active banners from both collections and localStorage
+    const activeTopBanner = useMemo(() => {
+        const combined = [...bannersFromBannersCollection, ...bannersFromItemsCollection];
+        const unique = [];
+        const seen = new Set();
+        for (const b of combined) {
+            const key = b.id || b.title;
+            if (!seen.has(key)) {
+                seen.add(key);
+                unique.push(b);
+            }
+        }
+        if (unique.length > 0) return unique[0];
+
+        try {
+            const cached = JSON.parse(localStorage.getItem("sokohub_active_banners") || "[]");
+            if (cached.length > 0) return cached[0];
+        } catch (e) {}
+
+        return null;
+    }, [bannersFromBannersCollection, bannersFromItemsCollection]);
 
     // Filter out items that are marked as banners so they don't pollute product grid
     const nonBannerItems = useMemo(() => {
@@ -136,9 +160,6 @@ export default function Home() {
         });
         return Array.from(map.values());
     }, [filteredItems]);
-
-    // Top active ad banner (or default placeholder if none exists yet)
-    const activeTopBanner = banners.length > 0 ? banners[0] : null;
 
     const handleBannerClick = () => {
         if (activeTopBanner) {

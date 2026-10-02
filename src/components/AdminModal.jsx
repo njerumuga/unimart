@@ -68,22 +68,46 @@ export default function AdminModal({ isOpen, onClose }) {
     return () => unsub();
   }, [isOpen]);
 
-  // Fetch active banners from banners collection or items fallback
+  // Fetch active banners from banners collection and items collection
   useEffect(() => {
     if (!isOpen) return;
     let unsubBanners = () => {};
+    let unsubItemBanners = () => {};
+
     try {
       const q = query(collection(db, "banners"));
       unsubBanners = onSnapshot(q, (snap) => {
         const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        setActiveBanners(arr);
+        setActiveBanners((prev) => {
+          const map = new Map();
+          [...arr, ...prev].forEach((b) => map.set(b.id || b.title, b));
+          return Array.from(map.values());
+        });
       }, (err) => {
         console.warn("Banners collection listen failed, trying items fallback:", err);
       });
     } catch (e) {
       console.warn("Could not query banners:", e);
     }
-    return () => unsubBanners();
+
+    try {
+      const qItems = query(collection(db, "items"), where("isBanner", "==", true));
+      unsubItemBanners = onSnapshot(qItems, (snap) => {
+        const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setActiveBanners((prev) => {
+          const map = new Map();
+          [...prev, ...arr].forEach((b) => map.set(b.id || b.title, b));
+          return Array.from(map.values());
+        });
+      }, (err) => {
+        console.warn("Items banner query error:", err);
+      });
+    } catch (e) {}
+
+    return () => {
+      unsubBanners();
+      unsubItemBanners();
+    };
   }, [isOpen]);
 
   const handleDecision = async (id, approved) => {
@@ -106,21 +130,25 @@ export default function AdminModal({ isOpen, onClose }) {
     }
   };
 
-  const handleDeleteBanner = async (bannerId) => {
+  const handleDeleteBanner = async (bannerId, bannerTitle) => {
     if (!window.confirm("🗑️ Delete this ad banner?")) return;
     try {
-      await deleteDoc(doc(db, "banners", bannerId));
-      setActiveBanners((prev) => prev.filter((b) => b.id !== bannerId));
+      await deleteDoc(doc(db, "banners", bannerId)).catch(() => {});
+      await deleteDoc(doc(db, "items", bannerId)).catch(() => {});
+
+      setActiveBanners((prev) => prev.filter((b) => b.id !== bannerId && b.title !== bannerTitle));
+
+      // Remove from localStorage
+      try {
+        const localCached = JSON.parse(localStorage.getItem("sokohub_active_banners") || "[]");
+        const filtered = localCached.filter((b) => b.id !== bannerId && b.title !== bannerTitle);
+        localStorage.setItem("sokohub_active_banners", JSON.stringify(filtered));
+      } catch (e) {}
+
       alert("✅ Banner deleted");
     } catch (err) {
       console.error("Error deleting banner:", err);
-      try {
-        await deleteDoc(doc(db, "items", bannerId));
-        setActiveBanners((prev) => prev.filter((b) => b.id !== bannerId));
-        alert("✅ Banner deleted");
-      } catch (err2) {
-        alert("Error deleting banner: " + err2.message);
-      }
+      alert("Error deleting banner: " + err.message);
     }
   };
 
@@ -173,12 +201,8 @@ export default function AdminModal({ isOpen, onClose }) {
         category: "AdBanner",
       };
 
+      // Always save to items collection with isBanner: true so all regular users receive it via public items feed
       try {
-        // Attempt primary write to banners collection
-        await addDoc(collection(db, "banners"), bannerData);
-      } catch (permissionErr) {
-        console.warn("Direct banners collection failed, saving as featured banner item:", permissionErr);
-        // Fallback: write to items collection
         await addDoc(collection(db, "items"), {
           ...bannerData,
           price: 0,
@@ -190,6 +214,15 @@ export default function AdminModal({ isOpen, onClose }) {
           isFeatured: true,
           locationZone: "Main Gate",
         });
+      } catch (itemsErr) {
+        console.warn("Could not write to items collection:", itemsErr);
+      }
+
+      // Also save to banners collection
+      try {
+        await addDoc(collection(db, "banners"), bannerData);
+      } catch (permissionErr) {
+        console.warn("Direct banners collection failed:", permissionErr);
       }
 
       // Also save in local storage cache for immediate local preview
@@ -603,7 +636,7 @@ export default function AdminModal({ isOpen, onClose }) {
                           </div>
 
                           <button
-                            onClick={() => handleDeleteBanner(b.id)}
+                            onClick={() => handleDeleteBanner(b.id, b.title)}
                             className="rounded-xl bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 text-[10px] font-bold uppercase transition flex-shrink-0"
                           >
                             🗑️ Delete
