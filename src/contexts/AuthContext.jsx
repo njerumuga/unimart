@@ -230,8 +230,8 @@ export function AuthProvider({ children }) {
       {!loading ? (
         children
       ) : (
-        <div className="flex h-screen items-center justify-center bg-[#F8FAFC] dark:bg-[#0F172A]">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-slate-200 dark:border-slate-700 border-t-[#2563EB]"></div>
+        <div className="flex h-screen items-center justify-center bg-soko-cream">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#ffb800] border-t-[#00a651]"></div>
         </div>
       )}
     </AuthContext.Provider>

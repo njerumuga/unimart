@@ -124,17 +124,17 @@ export default function SellerRatingModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-fadeIn overflow-y-auto">
-      <div className="w-full max-w-lg rounded-2xl bg-white dark:bg-slate-800 p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-700 my-8">
-        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-4">
+      <div className="w-full max-w-lg rounded-[32px] bg-white p-6 sm:p-8 shadow-2xl border border-gray-100 my-8">
+        <div className="flex items-center justify-between border-b border-gray-100 pb-4">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#2563EB] dark:text-blue-400">Verified Feedback</span>
-            <h3 className="text-lg font-bold text-[#0F172A] dark:text-white">
-              Rate & Review {sellerName || "Vendor"}
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#00a651]">Verified Feedback</span>
+            <h3 className="text-lg font-black text-gray-900">
+              Rate & Review {sellerName || "Seller"}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-700 transition"
+            className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition"
           >
             ✕
           </button>
@@ -144,15 +144,15 @@ export default function SellerRatingModal({
           {/* Optional Product Selector */}
           {sellerItems.length > 0 && (
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
+              <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">
                 Purchased Item (Optional)
               </label>
               <select
                 value={selectedItemId}
                 onChange={(e) => setSelectedItemId(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm outline-none transition focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium"
+                className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20 bg-white font-medium"
               >
-                <option value="">-- General Vendor Review --</option>
+                <option value="">-- General Seller Review --</option>
                 {sellerItems.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.title} (KSh {Number(item.price || 0).toLocaleString()})
@@ -164,17 +164,17 @@ export default function SellerRatingModal({
 
           {/* Star Rating Selection */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
+            <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">
               Rating
             </label>
-            <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 justify-center">
+            <div className="flex items-center gap-2 bg-[#f9fffb] p-3 rounded-2xl border border-green-100 justify-center">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   type="button"
                   key={star}
                   onClick={() => setRating(star)}
                   className={`text-3xl transition-transform hover:scale-125 focus:outline-none ${
-                    star <= rating ? "text-[#F97316]" : "text-slate-300 dark:text-slate-600"
+                    star <= rating ? "text-[#ffb800]" : "text-gray-200"
                   }`}
                 >
                   ★
@@ -185,7 +185,7 @@ export default function SellerRatingModal({
 
           {/* Review Input */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
+            <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">
               Your Review / Experience <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -194,18 +194,18 @@ export default function SellerRatingModal({
               placeholder="Was the item in good condition? Fast response? How did the transaction go?"
               rows="3"
               required
-              className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-3 text-sm outline-none transition focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] font-medium text-slate-900 dark:text-white"
+              className="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20 font-medium"
             />
           </div>
 
           {/* Review Photos & Video Proof Upload */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-              Attach Photos or Video Proof ({files.length}/4) <span className="text-slate-400 font-normal lowercase">(optional)</span>
+            <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-2">
+              Attach Photos or Video Proof ({files.length}/4) <span className="text-gray-400 font-normal lowercase">(optional)</span>
             </label>
             
             <div className="space-y-3">
-              <div className="rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 p-4 text-center hover:border-[#2563EB] transition bg-slate-50 dark:bg-slate-900/40">
+              <div className="rounded-2xl border-2 border-dashed border-gray-200 p-4 text-center hover:border-[#00a651] transition bg-gray-50/50">
                 <input
                   type="file"
                   id="review-media-upload"
@@ -216,10 +216,10 @@ export default function SellerRatingModal({
                 />
                 <label htmlFor="review-media-upload" className="cursor-pointer block space-y-1">
                   <div className="text-xl">📸 🎥</div>
-                  <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <p className="text-xs font-bold text-gray-700">
                     Add photos of received product or unboxing video
                   </p>
-                  <p className="text-[10px] text-slate-400">
+                  <p className="text-[10px] text-gray-400">
                     Helps other comrades verify item quality & authenticity
                   </p>
                 </label>
@@ -231,7 +231,7 @@ export default function SellerRatingModal({
                   {files.map((item) => (
                     <div
                       key={item.id}
-                      className="relative aspect-square rounded-xl overflow-hidden bg-black/5 border border-slate-200 dark:border-slate-700"
+                      className="relative aspect-square rounded-xl overflow-hidden bg-black/5 border border-gray-200"
                     >
                       {item.type === "video" ? (
                         <div className="w-full h-full bg-black flex items-center justify-center">
@@ -259,8 +259,8 @@ export default function SellerRatingModal({
           </div>
 
           {uploadStatus && (
-            <div className="p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-[#2563EB] dark:text-blue-300 rounded-xl text-xs font-bold flex items-center gap-2">
-              <div className="w-3.5 h-3.5 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin"></div>
+            <div className="p-3 bg-green-50 border border-green-200 text-[#00a651] rounded-2xl text-xs font-bold flex items-center gap-2">
+              <div className="w-3.5 h-3.5 border-2 border-[#00a651] border-t-transparent rounded-full animate-spin"></div>
               <span>{uploadStatus}</span>
             </div>
           )}
@@ -268,7 +268,7 @@ export default function SellerRatingModal({
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-xl bg-[#F97316] hover:bg-[#EA580C] py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-md transition-all hover:shadow-lg disabled:opacity-50"
+            className="w-full rounded-2xl bg-[#00a651] hover:bg-emerald-600 py-3.5 text-xs font-black uppercase tracking-widest text-white shadow-md transition-all hover:shadow-lg disabled:opacity-50"
           >
             {submitting ? "Submitting Review..." : "Submit Review"}
           </button>

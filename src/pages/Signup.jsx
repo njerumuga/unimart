@@ -43,24 +43,24 @@ export default function Signup() {
     };
 
     return (
-        <div className="min-h-[85vh] flex items-center justify-center bg-[#F8FAFC] dark:bg-[#0F172A] px-4 py-12 sm:px-6 lg:px-8">
-            <div className="w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-8 sm:p-10 shadow-sm">
+        <div className="min-h-[85vh] flex items-center justify-center bg-[#f9fffb] px-4 py-12 sm:px-6 lg:px-8">
+            <div className="w-full max-w-md rounded-[32px] border border-gray-100 bg-white p-8 sm:p-10 shadow-soft">
                 <div className="text-center mb-8">
-                    <div className="inline-flex rounded-xl bg-blue-50 dark:bg-blue-900/30 p-2 text-[#2563EB] mb-3">
-                        <div className="rounded-lg bg-[#2563EB] px-2.5 py-1 text-xs font-black text-white">
+                    <div className="inline-flex rounded-2xl bg-green-50 p-3 text-[#00a651] mb-3">
+                        <div className="rounded-xl bg-[#ffb800] px-2.5 py-1 text-xs font-black text-black">
                             SH
                         </div>
                     </div>
-                    <h2 className="text-2xl sm:text-3xl font-bold text-[#0F172A] dark:text-white tracking-tight">
+                    <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
                         Create Account 🚀
                     </h2>
-                    <p className="mt-1 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                    <p className="mt-1 text-xs sm:text-sm text-gray-500">
                         Join SokoHub and buy or sell across Meru campus
                     </p>
                 </div>
 
                 {error && (
-                    <div className="mb-5 rounded-xl bg-red-50 dark:bg-red-950/30 p-3.5 text-xs font-bold text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 flex items-center gap-2">
+                    <div className="mb-5 rounded-2xl bg-red-50 p-4 text-xs font-bold text-red-600 border border-red-100 flex items-center gap-2">
                         <span>⚠️</span>
                         <span>{error}</span>
                     </div>
@@ -68,7 +68,7 @@ export default function Signup() {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                        <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">
                             Full Name
                         </label>
                         <input
@@ -77,12 +77,12 @@ export default function Signup() {
                             value={form.displayName}
                             onChange={(e) => setForm({ ...form, displayName: e.target.value })}
                             required
-                            className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-3 text-sm outline-none transition focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-slate-900 dark:text-white font-medium"
+                            className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                        <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">
                             Email Address
                         </label>
                         <input
@@ -92,12 +92,12 @@ export default function Signup() {
                             value={form.email}
                             onChange={(e) => setForm({ ...form, email: e.target.value })}
                             required
-                            className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-3 text-sm outline-none transition focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-slate-900 dark:text-white font-medium"
+                            className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                        <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">
                             Password
                         </label>
                         <input
@@ -108,14 +108,14 @@ export default function Signup() {
                             onChange={(e) => setForm({ ...form, password: e.target.value })}
                             required
                             minLength={6}
-                            className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-3 text-sm outline-none transition focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-slate-900 dark:text-white font-medium"
+                            className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20"
                         />
                     </div>
 
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full rounded-xl bg-[#2563EB] hover:bg-blue-700 py-3.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-white shadow-md transition-all hover:shadow-lg disabled:opacity-60 active:scale-98 flex items-center justify-center gap-2"
+                        className="w-full rounded-2xl bg-[#00a651] hover:bg-emerald-600 py-4 text-xs sm:text-sm font-black uppercase tracking-widest text-white shadow-md transition-all hover:shadow-lg disabled:opacity-60 active:scale-98 flex items-center justify-center gap-2"
                     >
                         {loading ? "Creating account..." : "Sign Up"}
                     </button>
@@ -123,9 +123,9 @@ export default function Signup() {
 
                 <div className="relative my-6 text-center">
                     <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-slate-200 dark:border-slate-700"></div>
+                        <div className="w-full border-t border-gray-100"></div>
                     </div>
-                    <span className="relative bg-white dark:bg-slate-800 px-4 text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <span className="relative bg-white px-4 text-xs font-bold uppercase tracking-wider text-gray-400">
                         or sign up with
                     </span>
                 </div>
@@ -133,7 +133,7 @@ export default function Signup() {
                 <button
                     onClick={handleGoogleSignup}
                     disabled={loading}
-                    className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 shadow-sm transition flex items-center justify-center gap-3 disabled:opacity-60"
+                    className="w-full rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 py-3.5 text-xs font-black uppercase tracking-wider text-gray-700 shadow-sm transition flex items-center justify-center gap-3 disabled:opacity-60"
                 >
                     <svg className="w-4 h-4" viewBox="0 0 24 24">
                         <path
@@ -156,9 +156,9 @@ export default function Signup() {
                     Google
                 </button>
 
-                <p className="mt-8 text-center text-xs font-medium text-slate-500 dark:text-slate-400">
+                <p className="mt-8 text-center text-xs font-medium text-gray-500">
                     Already have an account?{" "}
-                    <Link to="/login" className="font-bold text-[#2563EB] hover:underline">
+                    <Link to="/login" className="font-black text-[#00a651] hover:underline">
                         Log in
                     </Link>
                 </p>

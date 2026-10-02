@@ -67,19 +67,19 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-16 text-center bg-[#F8FAFC] dark:bg-[#0F172A]">
-        <div className="w-20 h-20 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-3xl mb-4 text-[#2563EB]">
+      <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-16 text-center">
+        <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center text-3xl mb-4">
           👤
         </div>
-        <h2 className="text-2xl font-bold text-[#0F172A] dark:text-white mb-2">
+        <h2 className="text-2xl font-black text-gray-900 mb-2">
           Log in to view your profile
         </h2>
-        <p className="text-sm text-slate-500 max-w-sm mb-6">
+        <p className="text-sm text-gray-500 max-w-sm mb-6">
           Manage your active campus listings, view approval status, and manage your account.
         </p>
         <Link
           to="/login"
-          className="rounded-xl bg-[#2563EB] px-8 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-blue-700 transition"
+          className="rounded-2xl bg-[#00a651] px-8 py-3.5 text-xs font-black uppercase tracking-widest text-white shadow-md hover:bg-emerald-600 transition"
         >
           Go to Login
         </Link>
@@ -90,16 +90,16 @@ export default function Profile() {
   const displayName = user.displayName || user.email?.split("@")[0] || "Comrade Seller";
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] pb-24">
-      {/* Top Midnight Banner */}
-      <div className="bg-[#0F172A] text-white px-4 py-6 sm:px-6 md:px-12 border-b border-slate-800">
+    <div className="min-h-screen bg-[#f9fffb] dark:bg-[#111827] pb-24">
+      {/* Top Green Banner */}
+      <div className="bg-[#00a651] text-white px-4 py-6 sm:px-6 md:px-12">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight">
             My Profile
           </h1>
           <button
             onClick={handleLogout}
-            className="text-xs font-bold text-slate-300 hover:text-white transition underline underline-offset-4"
+            className="text-xs font-black text-white hover:text-green-100 transition underline underline-offset-4"
           >
             Logout
           </button>
@@ -108,22 +108,22 @@ export default function Profile() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-12 -mt-2 space-y-6 pt-4">
         {/* User / Admin Card */}
-        <div className="rounded-2xl bg-white dark:bg-slate-800 p-6 border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-4">
+        <div className="rounded-[24px] bg-[#eaf5ee] dark:bg-[#1a2e22] p-6 border border-green-200/60 dark:border-green-800 shadow-sm space-y-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="text-lg sm:text-xl font-bold text-[#0F172A] dark:text-white">
+              <h2 className="text-lg sm:text-xl font-black text-[#00a651] dark:text-[#22c55e]">
                 {displayName}
               </h2>
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-xs font-semibold text-gray-600 dark:text-gray-300 mt-0.5">
                 {user.email}
               </p>
-              <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mt-2">
+              <p className="text-xs font-bold text-gray-700 dark:text-gray-300 mt-2">
                 Total Posted Items: {items.length}
               </p>
             </div>
 
             {isAdmin && (
-              <span className="rounded-lg bg-[#2563EB] text-white px-3 py-1 text-[11px] font-bold uppercase shadow-sm">
+              <span className="rounded-lg bg-[#ffb800] text-black px-3 py-1 text-[11px] font-black uppercase shadow-sm">
                 ADMIN
               </span>
             )}
@@ -133,7 +133,7 @@ export default function Profile() {
           {isAdmin && (
             <button
               onClick={() => setIsAdminModalOpen(true)}
-              className="w-full rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white py-3.5 text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-98 flex items-center justify-center gap-2"
+              className="w-full rounded-2xl bg-[#00a651] hover:bg-emerald-600 text-white py-3.5 text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-98 flex items-center justify-center gap-2"
             >
               <span>⚙️</span>
               <span>OPEN ADMIN DASHBOARD PANEL</span>
@@ -143,23 +143,23 @@ export default function Profile() {
 
         {/* My Posted Listings Section */}
         <div className="space-y-4 pt-2">
-          <h3 className="text-base sm:text-lg font-bold text-[#0F172A] dark:text-white">
+          <h3 className="text-base sm:text-lg font-black text-gray-900 dark:text-white">
             My Posted Listings
           </h3>
 
           {loading ? (
             <div className="py-12 text-center">
-              <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-              <p className="text-xs font-bold text-slate-400">Loading listings...</p>
+              <div className="w-8 h-8 border-4 border-[#00a651] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+              <p className="text-xs font-bold text-gray-400">Loading listings...</p>
             </div>
           ) : items.length === 0 ? (
             <div className="py-12 text-center space-y-3">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
                 You haven't posted any items yet.
               </p>
               <Link
                 to="/post"
-                className="inline-block rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white px-6 py-2.5 text-xs font-black uppercase tracking-wider transition shadow-sm"
+                className="inline-block rounded-2xl bg-[#00a651] hover:bg-emerald-600 text-white px-6 py-2.5 text-xs font-black uppercase tracking-wider transition shadow-sm"
               >
                 + Post Your First Item
               </Link>
@@ -169,35 +169,35 @@ export default function Profile() {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="rounded-2xl bg-white dark:bg-slate-800 p-4 border border-slate-200/80 dark:border-slate-700 shadow-sm flex items-center gap-3 justify-between"
+                  className="rounded-2xl bg-white dark:bg-gray-800 p-4 border border-gray-100 dark:border-gray-700 shadow-sm flex items-center gap-3 justify-between"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <img
                       src={item.imageUrl || "https://via.placeholder.com/100"}
                       alt={item.title}
-                      className="w-16 h-16 rounded-xl object-cover bg-slate-100 dark:bg-slate-900"
+                      className="w-16 h-16 rounded-xl object-cover bg-gray-100"
                     />
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 mb-1">
                         {item.isApproved ? (
-                          <span className="bg-blue-50 dark:bg-blue-900/30 text-[#2563EB] dark:text-blue-300 text-[9px] font-bold uppercase px-2 py-0.5 rounded-md border border-blue-200/60 dark:border-blue-800">
+                          <span className="bg-green-100 text-[#00a651] text-[9px] font-black uppercase px-2 py-0.5 rounded-md">
                             ✓ Live
                           </span>
                         ) : (
-                          <span className="bg-amber-50 text-amber-700 text-[9px] font-bold uppercase px-2 py-0.5 rounded-md border border-amber-200">
+                          <span className="bg-amber-100 text-amber-700 text-[9px] font-black uppercase px-2 py-0.5 rounded-md">
                             ⏳ Pending
                           </span>
                         )}
                         {item.isFeatured && (
-                          <span className="bg-orange-50 text-[#F97316] text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-md border border-orange-200">
+                          <span className="bg-yellow-100 text-yellow-800 text-[9px] font-black uppercase px-1.5 py-0.5 rounded-md">
                             ⭐ Featured
                           </span>
                         )}
                       </div>
-                      <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                      <h4 className="text-xs font-bold text-gray-900 dark:text-white truncate">
                         {item.title}
                       </h4>
-                      <p className="text-xs font-black text-[#F97316]">
+                      <p className="text-xs font-black text-[#00a651]">
                         KSh {Number(item.price || 0).toLocaleString()}
                       </p>
                     </div>
@@ -206,7 +206,7 @@ export default function Profile() {
                   <div className="flex flex-col gap-1.5 pl-2">
                     <Link
                       to={`/item/${item.id}`}
-                      className="text-center bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-800 dark:text-slate-200 px-3 py-1.5 rounded-xl text-[10px] font-bold"
+                      className="text-center bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 text-gray-800 dark:text-gray-200 px-3 py-1.5 rounded-xl text-[10px] font-bold"
                     >
                       View
                     </Link>

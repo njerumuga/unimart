@@ -94,46 +94,36 @@ export default function Home() {
     }, [filteredItems]);
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] pb-24">
-            {/* Top Hero Banner (Deep Midnight Blue #0F172A) */}
-            <header className="bg-[#0F172A] pt-6 pb-12 px-4 sm:px-6 md:px-12 text-center text-white space-y-4 border-b border-slate-800">
+        <div className="min-h-screen bg-[#f9fffb] dark:bg-[#111827] pb-24">
+            {/* Top Green Hero Banner */}
+            <header className="bg-[#00a651] pt-6 pb-12 px-4 sm:px-6 md:px-12 text-center text-white space-y-4">
                 <div className="max-w-3xl mx-auto space-y-3">
-                    <div className="inline-flex items-center gap-2 rounded-full bg-blue-950/80 border border-blue-800/60 px-3.5 py-1 text-xs font-bold text-blue-300 mb-1">
-                        <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></span>
-                        <span>Meru Campus Student Marketplace</span>
-                    </div>
                     <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight uppercase">
-                        BUY & SELL <span className="text-[#2563EB]">ACROSS CAMPUS.</span>
+                        THE MERU MARKETPLACE.
                     </h1>
-                    <p className="max-w-xl mx-auto text-xs sm:text-sm text-slate-300 font-medium">
-                        Electronics, hostel goods, fashion, books, and services directly from verified student vendors. Safe. Fast. Local.
+                    <p className="max-w-xl mx-auto text-xs sm:text-sm text-green-50 font-medium">
+                        Buy, sell, and trade electronics, hostel goods, books, and services across Meru campus. Safe. Local. Verified.
                     </p>
 
-                    {/* Mobile-First Sticky / Modern Search Bar */}
+                    {/* Search Bar */}
                     <div className="max-w-xl mx-auto pt-2">
-                        <div className="relative flex items-center bg-white dark:bg-slate-800 rounded-full shadow-md border border-slate-200/80 dark:border-slate-700 overflow-hidden p-1.5 transition-all focus-within:ring-2 focus-within:ring-[#2563EB]">
-                            <span className="pl-3.5 pr-2 text-slate-400 text-base">🔍</span>
+                        <div className="relative flex items-center bg-white rounded-full shadow-lg overflow-hidden p-1.5">
+                            <span className="pl-3.5 pr-2 text-gray-400 text-base">🔍</span>
                             <input
                                 type="text"
-                                placeholder="Search phones, laptops, hostels, notes, shoes..."
+                                placeholder="Search phones, laptops, hostels, notes..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full py-2 px-1 text-xs sm:text-sm font-semibold text-slate-900 dark:text-white bg-transparent outline-none placeholder-slate-400"
+                                className="w-full py-2 px-1 text-xs sm:text-sm font-semibold text-gray-800 outline-none placeholder-gray-400"
                             />
                             {searchQuery && (
                                 <button
                                     onClick={() => setSearchQuery("")}
-                                    className="px-2 text-xs font-bold text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                                    className="px-3 text-xs font-bold text-gray-400 hover:text-gray-700"
                                 >
                                     ✕
                                 </button>
                             )}
-                            <button
-                                onClick={() => {}}
-                                className="rounded-full bg-[#2563EB] hover:bg-blue-700 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider transition shadow-sm"
-                            >
-                                Search
-                            </button>
                         </div>
                     </div>
 
@@ -143,10 +133,10 @@ export default function Home() {
                             <button
                                 key={chip.category}
                                 onClick={() => setSelectedCategory(chip.category)}
-                                className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-bold transition-all ${
+                                className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-black transition-all ${
                                     selectedCategory === chip.category
-                                        ? "bg-[#2563EB] text-white shadow-md scale-105"
-                                        : "bg-slate-800/80 hover:bg-slate-800 text-slate-300 border border-slate-700/60"
+                                        ? "bg-white text-[#00a651] shadow-md scale-105"
+                                        : "bg-white/20 hover:bg-white/30 text-white"
                                 }`}
                             >
                                 {chip.label}
@@ -158,16 +148,16 @@ export default function Home() {
 
             {/* Category Selectors & Controls */}
             <div className="max-w-6xl mx-auto px-4 sm:px-6 -mt-5 space-y-4">
-                {/* Scrollable Horizontal Category Navigation Pills */}
-                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar bg-white dark:bg-slate-800 p-2 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700">
+                {/* Horizontal Category Selector */}
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar bg-white dark:bg-[#1f2937] p-2 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
                     {["All", ...categories].map((c) => (
                         <button
                             key={c}
                             onClick={() => setSelectedCategory(c)}
-                            className={`whitespace-nowrap rounded-xl px-4 py-2 text-xs font-bold transition-all ${
+                            className={`whitespace-nowrap rounded-xl px-4 py-2 text-xs font-black transition-all ${
                                 selectedCategory === c
-                                    ? "bg-[#2563EB] text-white shadow-sm font-black"
-                                    : "bg-[#F1F5F9] dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 font-semibold"
+                                    ? "bg-[#00a651] text-white shadow-sm"
+                                    : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200"
                             }`}
                         >
                             {c}
@@ -177,21 +167,21 @@ export default function Home() {
 
                 {/* View Mode & Area Controls Bar */}
                 <div className="flex flex-wrap items-center justify-between gap-3 px-1">
-                    <p className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                    <p className="text-xs font-bold text-gray-600 dark:text-gray-400">
                         {viewMode === "bundled"
-                            ? `${sellerBundles.length} Vendor Stores (${filteredItems.length} items)`
+                            ? `${sellerBundles.length} Seller Stores (${filteredItems.length} items)`
                             : `${filteredItems.length} Listings found`}
                     </p>
 
                     <div className="flex items-center gap-2 flex-wrap">
                         {/* View Toggle */}
-                        <div className="flex items-center bg-slate-200 dark:bg-slate-800 p-1 rounded-xl border border-slate-300/60 dark:border-slate-700">
+                        <div className="flex items-center bg-gray-200 dark:bg-gray-800 p-1 rounded-xl">
                             <button
                                 onClick={() => setViewMode("bundled")}
                                 className={`px-3 py-1.5 text-[11px] font-black uppercase rounded-lg transition ${
                                     viewMode === "bundled"
-                                        ? "bg-[#2563EB] text-white shadow-sm"
-                                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                                        ? "bg-[#00a651] text-white shadow-sm"
+                                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900"
                                 }`}
                             >
                                 👥 BY SELLER
@@ -200,8 +190,8 @@ export default function Home() {
                                 onClick={() => setViewMode("single")}
                                 className={`px-3 py-1.5 text-[11px] font-black uppercase rounded-lg transition ${
                                     viewMode === "single"
-                                        ? "bg-[#2563EB] text-white shadow-sm"
-                                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                                        ? "bg-[#00a651] text-white shadow-sm"
+                                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900"
                                 }`}
                             >
                                 📦 ALL ITEMS
@@ -213,7 +203,7 @@ export default function Home() {
                             <select
                                 value={selectedLocation}
                                 onChange={(e) => setSelectedLocation(e.target.value)}
-                                className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none shadow-sm cursor-pointer"
+                                className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1f2937] px-3 py-1.5 text-xs font-black text-gray-700 dark:text-gray-300 outline-none shadow-sm"
                             >
                                 <option value="All">AREA: ALL</option>
                                 {locations.map((loc) => (
@@ -231,16 +221,16 @@ export default function Home() {
             <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
                 {loading ? (
                     <div className="py-20 text-center">
-                        <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Loading campus listings...</p>
+                        <div className="w-10 h-10 border-4 border-[#00a651] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Loading campus listings...</p>
                     </div>
                 ) : filteredItems.length === 0 ? (
-                    <div className="rounded-2xl bg-white dark:bg-slate-800 p-12 text-center border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-4 max-w-md mx-auto">
-                        <div className="w-14 h-14 rounded-full bg-blue-50 dark:bg-blue-900/30 text-2xl flex items-center justify-center mx-auto text-[#2563EB]">
+                    <div className="rounded-[32px] bg-white dark:bg-[#1f2937] p-12 text-center border border-gray-100 dark:border-gray-800 shadow-sm space-y-4 max-w-md mx-auto">
+                        <div className="w-14 h-14 rounded-full bg-green-50 text-2xl flex items-center justify-center mx-auto">
                             🔍
                         </div>
-                        <h3 className="text-base font-bold text-[#0F172A] dark:text-white">No Listings Found</h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                        <h3 className="text-base font-bold text-gray-900 dark:text-white">No Listings Found</h3>
+                        <p className="text-xs text-gray-500">
                             Try selecting another category or area zone.
                         </p>
                         <div className="pt-2 flex justify-center gap-3">
@@ -250,20 +240,20 @@ export default function Home() {
                                     setSelectedLocation("All");
                                     setSearchQuery("");
                                 }}
-                                className="rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 px-5 py-2 text-xs font-bold uppercase transition"
+                                className="rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 text-xs font-black uppercase"
                             >
                                 Reset
                             </button>
                             <Link
                                 to="/post"
-                                className="rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white px-5 py-2 text-xs font-black uppercase shadow-sm transition"
+                                className="rounded-2xl bg-[#00a651] hover:bg-emerald-600 text-white px-5 py-2 text-xs font-black uppercase shadow-sm"
                             >
                                 Post Item
                             </Link>
                         </div>
                     </div>
                 ) : viewMode === "bundled" ? (
-                    /* Bundled by Seller Grid */
+                    /* Bundled by Seller Grid (Image 5) */
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {sellerBundles.map((bundle) => (
                             <SellerBundleCard key={bundle.sellerId} bundle={bundle} />

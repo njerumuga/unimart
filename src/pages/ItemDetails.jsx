@@ -97,26 +97,26 @@ export default function ItemDetails() {
 
     if (loading) {
         return (
-            <div className="min-h-[70vh] flex flex-col items-center justify-center py-20 px-4 bg-[#F8FAFC] dark:bg-[#0F172A]">
-                <div className="w-12 h-12 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mb-4"></div>
-                <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Loading item details...</p>
+            <div className="min-h-[70vh] flex flex-col items-center justify-center py-20 px-4">
+                <div className="w-12 h-12 border-4 border-[#00a651] border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">Loading item details...</p>
             </div>
         );
     }
 
     if (!item) {
         return (
-            <div className="min-h-[70vh] flex flex-col items-center justify-center py-20 px-4 text-center bg-[#F8FAFC] dark:bg-[#0F172A]">
-                <div className="w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-3xl mb-4">
+            <div className="min-h-[70vh] flex flex-col items-center justify-center py-20 px-4 text-center">
+                <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center text-3xl mb-4">
                     🔍
                 </div>
-                <h2 className="text-2xl font-bold text-[#0F172A] dark:text-white mb-2">Item Not Found</h2>
-                <p className="text-sm text-slate-500 max-w-md mb-6">
+                <h2 className="text-2xl font-black text-gray-900 mb-2">Item Not Found</h2>
+                <p className="text-sm text-gray-500 max-w-md mb-6">
                     This listing may have been sold, removed, or is no longer available on SokoHub.
                 </p>
                 <Link
                     to="/"
-                    className="rounded-xl bg-[#2563EB] px-6 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-md hover:bg-blue-700 transition"
+                    className="rounded-2xl bg-[#00a651] px-6 py-3 text-xs font-black uppercase tracking-widest text-white shadow-md hover:bg-emerald-600 transition"
                 >
                     Back to Marketplace
                 </Link>
@@ -141,22 +141,22 @@ export default function ItemDetails() {
     const firstName = String(sellerName).trim().split(" ")[0] || "Seller";
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[#f9fffb] py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-6xl mx-auto space-y-6">
                 {/* Breadcrumbs */}
-                <nav className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                    <Link to="/" className="hover:text-[#2563EB] transition">Home</Link>
+                <nav className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    <Link to="/" className="hover:text-[#00a651] transition">Home</Link>
                     <span>/</span>
-                    <span className="text-[#2563EB]">{item.category || "Listing"}</span>
+                    <span className="text-[#00a651]">{item.category || "Listing"}</span>
                     <span>/</span>
-                    <span className="text-slate-700 dark:text-slate-300 truncate max-w-[200px] sm:max-w-xs">{item.title}</span>
+                    <span className="text-gray-700 truncate max-w-[200px] sm:max-w-xs">{item.title}</span>
                 </nav>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* Left Column: Media & Highlights */}
                     <div className="lg:col-span-7 space-y-4">
                         {/* Primary Media Display Viewport */}
-                        <div className="relative aspect-square sm:aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700 shadow-sm flex items-center justify-center">
+                        <div className="relative aspect-square sm:aspect-[4/3] rounded-[32px] overflow-hidden bg-black/5 border border-gray-100 shadow-soft flex items-center justify-center">
                             {activeMedia.type === "video" ? (
                                 <div className="w-full h-full bg-black flex items-center justify-center">
                                     <video
@@ -178,16 +178,16 @@ export default function ItemDetails() {
 
                             {/* Badges Overlays */}
                             <div className="absolute top-4 left-4 flex flex-wrap gap-2 pointer-events-none">
-                                <div className="bg-[#0F172A]/85 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase backdrop-blur-md shadow-sm">
+                                <div className="bg-black/75 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase backdrop-blur-md">
                                     📍 {locationZone}
                                 </div>
                                 {item.isFeatured && (
-                                    <div className="bg-[#F97316] text-white px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider shadow-sm">
+                                    <div className="bg-[#ffb800] text-black px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg">
                                         ⭐ Featured
                                     </div>
                                 )}
                                 {activeMedia.type === "video" && (
-                                    <div className="bg-red-600 text-white px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider shadow-sm flex items-center gap-1.5">
+                                    <div className="bg-red-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg flex items-center gap-1.5">
                                         <span>▶</span> Product Video Demo
                                     </div>
                                 )}
@@ -195,8 +195,8 @@ export default function ItemDetails() {
 
                             {item.condition && (
                                 <div className="absolute bottom-4 left-4 pointer-events-none">
-                                    <div className="bg-white/95 dark:bg-slate-800/95 text-slate-800 dark:text-slate-200 px-3 py-1 rounded-lg text-xs font-bold uppercase backdrop-blur-md shadow-sm border border-slate-200/60 dark:border-slate-700">
-                                        Condition: <span className="text-[#2563EB] dark:text-blue-400">{item.condition}</span>
+                                    <div className="bg-white/90 text-gray-800 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase backdrop-blur-md shadow-sm border border-gray-200/50">
+                                        Condition: <span className="text-[#00a651]">{item.condition}</span>
                                     </div>
                                 </div>
                             )}
@@ -204,7 +204,7 @@ export default function ItemDetails() {
                             {/* Share button */}
                             <button
                                 onClick={handleShare}
-                                className="absolute top-4 right-4 bg-white/90 dark:bg-slate-800/90 hover:bg-white text-slate-700 dark:text-slate-200 p-2.5 rounded-full shadow-md backdrop-blur-md transition hover:scale-110 active:scale-95 z-10"
+                                className="absolute top-4 right-4 bg-white/90 hover:bg-white text-gray-700 p-2.5 rounded-full shadow-md backdrop-blur-md transition hover:scale-110 active:scale-95 z-10"
                                 title="Share Listing"
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,12 +215,12 @@ export default function ItemDetails() {
 
                         {/* Interactive Media Thumbnail Strip */}
                         {mediaList.length > 1 && (
-                            <div className="bg-white dark:bg-slate-800 rounded-2xl p-3 border border-slate-200/80 dark:border-slate-700 shadow-sm">
+                            <div className="bg-white rounded-[24px] p-3 border border-gray-100 shadow-sm">
                                 <div className="flex items-center justify-between mb-2 px-1">
-                                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                    <span className="text-[10px] font-black uppercase tracking-wider text-gray-400">
                                         Media Gallery ({activeMediaIndex + 1} of {mediaList.length})
                                     </span>
-                                    <span className="text-[10px] font-bold text-[#2563EB] dark:text-blue-400">
+                                    <span className="text-[10px] font-bold text-[#00a651]">
                                         Click thumbnail to preview
                                     </span>
                                 </div>
@@ -230,10 +230,10 @@ export default function ItemDetails() {
                                             key={idx}
                                             type="button"
                                             onClick={() => setActiveMediaIndex(idx)}
-                                            className={`relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
+                                            className={`relative flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden border-2 transition-all ${
                                                 activeMediaIndex === idx
-                                                    ? "border-[#2563EB] ring-2 ring-[#2563EB]/30 scale-105"
-                                                    : "border-slate-200 dark:border-slate-700 opacity-70 hover:opacity-100"
+                                                    ? "border-[#00a651] ring-2 ring-[#00a651]/30 scale-105"
+                                                    : "border-gray-200 opacity-70 hover:opacity-100"
                                             }`}
                                         >
                                             {media.type === "video" ? (
@@ -254,21 +254,21 @@ export default function ItemDetails() {
                         )}
 
                         {copied && (
-                            <div className="p-3 bg-blue-50 dark:bg-blue-900/30 text-[#2563EB] dark:text-blue-300 text-xs font-bold rounded-xl text-center border border-blue-200 dark:border-blue-800">
+                            <div className="p-3 bg-green-100 text-[#00a651] text-xs font-bold rounded-2xl text-center">
                                 ✓ Listing link copied to clipboard!
                             </div>
                         )}
 
                         {/* Safety Box */}
-                        <div className="rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-5 space-y-2">
-                            <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200 font-bold text-xs uppercase tracking-wider">
+                        <div className="rounded-[24px] bg-amber-50/70 border border-amber-200/60 p-5 space-y-2">
+                            <div className="flex items-center gap-2 text-amber-800 font-bold text-xs uppercase tracking-wider">
                                 <span>🛡️</span>
                                 <span>Campus Buyer Protection Tips</span>
                             </div>
-                            <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-1 list-disc list-inside">
+                            <ul className="text-xs text-amber-900/80 space-y-1 list-disc list-inside">
                                 <li>Meet the seller at safe public campus areas (e.g. Main Gate, Library, Cafeteria).</li>
                                 <li>Always inspect the item thoroughly in person before paying.</li>
-                                <li>Prefer verified vendors and avoid sending advance deposits.</li>
+                                <li>Avoid sending advance payments or deposits.</li>
                             </ul>
                         </div>
                     </div>
@@ -276,66 +276,66 @@ export default function ItemDetails() {
                     {/* Right Column: Information & Actions */}
                     <div className="lg:col-span-5 space-y-6">
                         {/* Title & Price Card */}
-                        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-6">
+                        <div className="bg-white rounded-[32px] p-6 sm:p-8 border border-gray-100 shadow-soft space-y-6">
                             <div>
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-xs uppercase tracking-wider font-bold text-[#2563EB] dark:text-blue-400">
+                                    <span className="text-xs uppercase tracking-widest font-black text-[#00a651]">
                                         {item.category || "General"}
                                     </span>
                                     {item.isApproved ? (
-                                        <span className="text-[10px] font-bold bg-blue-50 dark:bg-blue-900/30 text-[#2563EB] dark:text-blue-300 px-2.5 py-1 rounded-full uppercase border border-blue-200/60 dark:border-blue-800/60">
+                                        <span className="text-[10px] font-bold bg-green-50 text-green-700 px-2.5 py-1 rounded-full uppercase">
                                             ✓ Verified Listing
                                         </span>
                                     ) : (
-                                        <span className="text-[10px] font-bold bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full uppercase border border-amber-200">
+                                        <span className="text-[10px] font-bold bg-yellow-50 text-yellow-700 px-2.5 py-1 rounded-full uppercase">
                                             ⏳ Pending Review
                                         </span>
                                     )}
                                 </div>
-                                <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] dark:text-white leading-tight">
+                                <h1 className="text-2xl sm:text-3xl font-black text-gray-900 leading-tight">
                                     {item.title}
                                 </h1>
                             </div>
 
-                            <div className="bg-[#0F172A] text-white rounded-xl p-4 border border-slate-700 flex items-center justify-between">
+                            <div className="bg-[#f9fffb] rounded-2xl p-4 border border-green-100 flex items-center justify-between">
                                 <div>
-                                    <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Price</p>
-                                    <p className="text-2xl sm:text-3xl font-black text-[#F97316]">
+                                    <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Price</p>
+                                    <p className="text-2xl sm:text-3xl font-black text-[#00a651]">
                                         KSh {Number(item.price || 0).toLocaleString()}
                                     </p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Location</p>
-                                    <p className="text-xs font-bold text-slate-200">📍 {locationZone}</p>
+                                    <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Location</p>
+                                    <p className="text-xs font-bold text-gray-700">📍 {locationZone}</p>
                                 </div>
                             </div>
 
                             {/* Description */}
                             <div className="space-y-2">
-                                <h3 className="text-xs uppercase tracking-wider font-bold text-slate-400">
-                                    Description & Details
+                                <h3 className="text-xs uppercase tracking-widest font-black text-gray-400">
+                                    Description & Usage Details
                                 </h3>
-                                <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line leading-relaxed">
+                                <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
                                     {item.description || "No specific description provided by seller."}
                                 </p>
                             </div>
 
-                            {/* High-Action CTA Button (Energetic Orange WhatsApp Button) */}
+                            {/* Primary Action Button (WhatsApp) */}
                             <div className="pt-2">
                                 {whatsappUrl ? (
                                     <a
                                         href={whatsappUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="w-full flex items-center justify-center gap-2 bg-[#F97316] hover:bg-[#EA580C] text-white py-4 px-6 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider shadow-md hover:shadow-lg transition-all active:scale-98"
+                                        className="w-full flex items-center justify-center gap-2 bg-[#00a651] hover:bg-emerald-600 text-white py-4 px-6 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-widest shadow-lg hover:shadow-xl transition-all active:scale-98"
                                     >
                                         <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
                                             <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.969.54 1.761.815 2.796.815 3.182 0 5.767-2.586 5.768-5.766 0-3.18-2.586-5.766-5.768-5.766zm9.969 5.766c0 5.514-4.486 10-10 10-1.823 0-3.539-.493-5.018-1.354l-4.982 1.306 1.332-4.862c-.939-1.528-1.474-3.323-1.474-5.244 0-5.514 4.486-10 10-10s10 4.486 10 10z" />
                                         </svg>
-                                        Contact Seller on WhatsApp
+                                        Chat with Seller on WhatsApp
                                     </a>
                                 ) : (
-                                    <div className="rounded-xl bg-slate-100 dark:bg-slate-700 p-4 text-center text-xs font-bold text-slate-500">
+                                    <div className="rounded-2xl bg-gray-100 p-4 text-center text-xs font-bold text-gray-500">
                                         Seller contact is currently unavailable.
                                     </div>
                                 )}
@@ -343,24 +343,24 @@ export default function ItemDetails() {
                         </div>
 
                         {/* Seller Card */}
-                        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-4">
+                        <div className="bg-white rounded-[32px] p-6 border border-gray-100 shadow-soft space-y-4">
                             <div className="flex items-center justify-between">
-                                <span className="text-xs uppercase tracking-wider font-bold text-slate-400">
-                                    Vendor Details
+                                <span className="text-xs uppercase tracking-widest font-black text-gray-400">
+                                    Seller Details
                                 </span>
                                 <TrustBadge type="verified" text="Verified" />
                             </div>
 
                             <div className="flex items-center gap-4">
-                                <div className="h-12 w-12 rounded-full bg-[#2563EB] text-white flex items-center justify-center text-base font-black shadow-sm">
+                                <div className="h-14 w-14 rounded-full bg-green-100 border-2 border-[#00a651] flex items-center justify-center text-lg font-black text-[#00a651]">
                                     {firstName.charAt(0).toUpperCase()}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h4 className="text-base font-bold text-[#0F172A] dark:text-white truncate">
+                                    <h4 className="text-base font-bold text-gray-900 truncate">
                                         {sellerName}
                                     </h4>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                                        Active Campus Vendor
+                                    <p className="text-xs text-gray-500">
+                                        Active Campus Comrade
                                     </p>
                                 </div>
                             </div>
@@ -368,9 +368,9 @@ export default function ItemDetails() {
                             {sellerId && (
                                 <Link
                                     to={`/seller/${sellerId}`}
-                                    className="block w-full text-center bg-slate-100 dark:bg-slate-700 hover:bg-[#2563EB] text-slate-800 dark:text-slate-200 hover:text-white py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm active:scale-98"
+                                    className="block w-full text-center bg-[#ffb800] hover:bg-[#00a651] text-black hover:text-white py-3 px-4 rounded-2xl text-xs font-black uppercase tracking-widest transition shadow-sm active:scale-98"
                                 >
-                                    View Full Vendor Store & Reviews
+                                    View Full Seller Store & Reviews
                                 </Link>
                             )}
                         </div>
