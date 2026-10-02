@@ -7,14 +7,19 @@ import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
 import { categories } from "../data/categories";
 import { locations } from "../data/locations";
+import AdDetailsModal from "../components/AdDetailsModal";
+import AdvertiseModal from "../components/AdvertiseModal";
 
 export default function Home() {
     const [items, setItems] = useState([]);
+    const [banners, setBanners] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [selectedLocation, setSelectedLocation] = useState("All");
     const [searchQuery, setSearchQuery] = useState("");
     const [viewMode, setViewMode] = useState("bundled"); // "bundled" (By Seller) or "single" (All Items)
     const [loading, setLoading] = useState(true);
+    const [selectedBanner, setSelectedBanner] = useState(null);
+    const [isAdvertiseModalOpen, setIsAdvertiseModalOpen] = useState(false);
     const { isAdmin } = useAuth();
 
     const quickChips = [
@@ -25,6 +30,7 @@ export default function Home() {
         { label: "📚 Notes", category: "Notes" },
     ];
 
+    // Listen to items
     useEffect(() => {
         const q = query(
             collection(db, "items"),
@@ -37,7 +43,7 @@ export default function Home() {
                 const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
                 const visibleItems = isAdmin 
                     ? arr 
-                    : arr.filter((i) => i.isApproved === true);
+                    : arr.filter((i) => i.isApproved === true && !i.isBanner);
                 setItems(visibleItems);
                 setLoading(false);
             },
@@ -49,8 +55,46 @@ export default function Home() {
         return () => unsub();
     }, [isAdmin]);
 
+    // Listen to active banners
+    useEffect(() => {
+        let unsubBanners = () => {};
+        try {
+            const q = query(collection(db, "banners"));
+            unsubBanners = onSnapshot(
+                q,
+                (snap) => {
+                    const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+                    if (list.length > 0) {
+                        setBanners(list);
+                    } else {
+                        // Check local storage backup
+                        try {
+                            const cached = JSON.parse(localStorage.getItem("sokohub_active_banners") || "[]");
+                            if (cached.length > 0) setBanners(cached);
+                        } catch (e) {}
+                    }
+                },
+                (err) => {
+                    console.warn("Banners query error, checking local fallback:", err);
+                    try {
+                        const cached = JSON.parse(localStorage.getItem("sokohub_active_banners") || "[]");
+                        if (cached.length > 0) setBanners(cached);
+                    } catch (e) {}
+                }
+            );
+        } catch (err) {
+            console.warn("Banner init note:", err);
+        }
+        return () => unsubBanners();
+    }, []);
+
+    // Filter out items that are marked as banners so they don't pollute product grid
+    const nonBannerItems = useMemo(() => {
+        return items.filter((i) => !i.isBanner && i.category !== "AdBanner");
+    }, [items]);
+
     const filteredItems = useMemo(() => {
-        let filtered = items;
+        let filtered = nonBannerItems;
         
         if (selectedCategory !== "All") {
             filtered = filtered.filter((item) => item.category === selectedCategory);
@@ -72,7 +116,7 @@ export default function Home() {
         }
 
         return filtered;
-    }, [items, selectedCategory, selectedLocation, searchQuery]);
+    }, [nonBannerItems, selectedCategory, selectedLocation, searchQuery]);
 
     // Group items by Seller into Bundles
     const sellerBundles = useMemo(() => {
@@ -93,10 +137,21 @@ export default function Home() {
         return Array.from(map.values());
     }, [filteredItems]);
 
+    // Top active ad banner (or default placeholder if none exists yet)
+    const activeTopBanner = banners.length > 0 ? banners[0] : null;
+
+    const handleBannerClick = () => {
+        if (activeTopBanner) {
+            setSelectedBanner(activeTopBanner);
+        } else {
+            setIsAdvertiseModalOpen(true);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-[#f9fffb] dark:bg-[#111827] pb-24">
             {/* Top Green Hero Banner */}
-            <header className="bg-[#00a651] pt-6 pb-12 px-4 sm:px-6 md:px-12 text-center text-white space-y-4">
+            <header className="bg-[#00a651] pt-6 pb-10 px-4 sm:px-6 md:px-12 text-center text-white space-y-4">
                 <div className="max-w-3xl mx-auto space-y-3">
                     <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight uppercase">
                         THE MERU MARKETPLACE.
@@ -127,17 +182,13 @@ export default function Home() {
                         </div>
                     </div>
 
-                    {/* Quick Category Chips in Hero */}
-                    <div className="flex items-center justify-center gap-2 overflow-x-auto no-scrollbar pt-2">
+                    {/* Quick Category Chips */}
+                    <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
                         {quickChips.map((chip) => (
                             <button
                                 key={chip.category}
                                 onClick={() => setSelectedCategory(chip.category)}
-                                className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-black transition-all ${
-                                    selectedCategory === chip.category
-                                        ? "bg-white text-[#00a651] shadow-md scale-105"
-                                        : "bg-white/20 hover:bg-white/30 text-white"
-                                }`}
+                                className="rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md px-3 py-1 text-[11px] font-bold text-white transition active:scale-95 border border-white/20"
                             >
                                 {chip.label}
                             </button>
@@ -146,8 +197,54 @@ export default function Home() {
                 </div>
             </header>
 
-            {/* Category Selectors & Controls */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 -mt-5 space-y-4">
+            {/* Top Navigation & Filters */}
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 -mt-4 space-y-4">
+                {/* 📢 TOP CAMPUS AD / BUSINESS SPOTLIGHT PLACEHOLDER (CLICKABLE) */}
+                <div 
+                    onClick={handleBannerClick}
+                    className="cursor-pointer group relative rounded-[28px] bg-gradient-to-r from-amber-500 via-[#00a651] to-emerald-700 p-0.5 shadow-lg hover:shadow-xl transition-all duration-300 transform active:scale-[0.99]"
+                >
+                    <div className="rounded-[26px] bg-white dark:bg-gray-800 p-3.5 sm:p-4.5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-3.5 min-w-0 w-full sm:w-auto">
+                            {activeTopBanner?.imageUrl ? (
+                                <img
+                                    src={activeTopBanner.imageUrl}
+                                    alt={activeTopBanner.title}
+                                    className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover bg-gray-100 flex-shrink-0 border border-amber-300 shadow-sm"
+                                />
+                            ) : (
+                                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-[#00a651] flex items-center justify-center text-2xl text-white shadow-sm flex-shrink-0 animate-pulse">
+                                    📢
+                                </div>
+                            )}
+
+                            <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2 mb-0.5">
+                                    <span className="rounded-full bg-[#ffb800] text-black px-2 py-0.5 text-[9px] font-black uppercase tracking-wider">
+                                        CAMPUS SPOTLIGHT
+                                    </span>
+                                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold hidden sm:inline">
+                                        ⚡ Featured Ad
+                                    </span>
+                                </div>
+                                <h3 className="text-sm sm:text-base font-black text-gray-900 dark:text-white truncate group-hover:text-[#00a651] transition">
+                                    {activeTopBanner?.title || "Boost Your Business or Hostel Here!"}
+                                </h3>
+                                <p className="text-xs text-gray-600 dark:text-gray-300 truncate">
+                                    {activeTopBanner?.details || activeTopBanner?.description || "Reach 10,000+ campus students daily. Tap to view details or place your ad."}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                            <span className="inline-flex items-center gap-1.5 rounded-2xl bg-[#00a651] group-hover:bg-emerald-600 text-white px-4 py-2 text-xs font-black uppercase tracking-wider shadow-sm transition">
+                                <span>👉</span>
+                                <span>{activeTopBanner ? "View Offer" : "Advertise Now"}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Horizontal Category Selector */}
                 <div className="flex items-center gap-2 overflow-x-auto no-scrollbar bg-white dark:bg-[#1f2937] p-2 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
                     {["All", ...categories].map((c) => (
@@ -181,7 +278,7 @@ export default function Home() {
                                 className={`px-3 py-1.5 text-[11px] font-black uppercase rounded-lg transition ${
                                     viewMode === "bundled"
                                         ? "bg-[#00a651] text-white shadow-sm"
-                                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900"
+                                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                                 }`}
                             >
                                 👥 BY SELLER
@@ -191,7 +288,7 @@ export default function Home() {
                                 className={`px-3 py-1.5 text-[11px] font-black uppercase rounded-lg transition ${
                                     viewMode === "single"
                                         ? "bg-[#00a651] text-white shadow-sm"
-                                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900"
+                                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                                 }`}
                             >
                                 📦 ALL ITEMS
@@ -253,7 +350,7 @@ export default function Home() {
                         </div>
                     </div>
                 ) : viewMode === "bundled" ? (
-                    /* Bundled by Seller Grid (Image 5) */
+                    /* Bundled by Seller Grid */
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {sellerBundles.map((bundle) => (
                             <SellerBundleCard key={bundle.sellerId} bundle={bundle} />
@@ -268,6 +365,19 @@ export default function Home() {
                     </div>
                 )}
             </main>
+
+            {/* Clickable Ad Details Modal */}
+            <AdDetailsModal
+                isOpen={Boolean(selectedBanner)}
+                onClose={() => setSelectedBanner(null)}
+                banner={selectedBanner}
+            />
+
+            {/* Advertise Modal */}
+            <AdvertiseModal
+                isOpen={isAdvertiseModalOpen}
+                onClose={() => setIsAdvertiseModalOpen(false)}
+            />
         </div>
     );
 }

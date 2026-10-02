@@ -11,12 +11,14 @@ import {
 } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import AdminModal from "../components/AdminModal";
+import EditItemModal from "../components/EditItemModal";
 
 export default function Profile() {
   const { user, isAdmin, logout } = useAuth();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -71,7 +73,7 @@ export default function Profile() {
         <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center text-3xl mb-4">
           👤
         </div>
-        <h2 className="text-2xl font-black text-gray-900 mb-2">
+        <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2">
           Log in to view your profile
         </h2>
         <p className="text-sm text-gray-500 max-w-sm mb-6">
@@ -143,9 +145,17 @@ export default function Profile() {
 
         {/* My Posted Listings Section */}
         <div className="space-y-4 pt-2">
-          <h3 className="text-base sm:text-lg font-black text-gray-900 dark:text-white">
-            My Posted Listings
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-base sm:text-lg font-black text-gray-900 dark:text-white">
+              My Posted Listings
+            </h3>
+            <Link
+              to="/post"
+              className="text-xs font-black text-[#00a651] hover:underline uppercase tracking-wider"
+            >
+              + Post New Item
+            </Link>
+          </div>
 
           {loading ? (
             <div className="py-12 text-center">
@@ -175,16 +185,16 @@ export default function Profile() {
                     <img
                       src={item.imageUrl || "https://via.placeholder.com/100"}
                       alt={item.title}
-                      className="w-16 h-16 rounded-xl object-cover bg-gray-100"
+                      className="w-16 h-16 rounded-xl object-cover bg-gray-100 flex-shrink-0"
                     />
                     <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 mb-1">
+                      <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                         {item.isApproved ? (
-                          <span className="bg-green-100 text-[#00a651] text-[9px] font-black uppercase px-2 py-0.5 rounded-md">
+                          <span className="bg-green-100 dark:bg-green-900/40 text-[#00a651] text-[9px] font-black uppercase px-2 py-0.5 rounded-md">
                             ✓ Live
                           </span>
                         ) : (
-                          <span className="bg-amber-100 text-amber-700 text-[9px] font-black uppercase px-2 py-0.5 rounded-md">
+                          <span className="bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-[9px] font-black uppercase px-2 py-0.5 rounded-md">
                             ⏳ Pending
                           </span>
                         )}
@@ -200,19 +210,29 @@ export default function Profile() {
                       <p className="text-xs font-black text-[#00a651]">
                         KSh {Number(item.price || 0).toLocaleString()}
                       </p>
+                      <p className="text-[10px] text-gray-400 truncate">
+                        📍 {item.locationZone || "Main Gate"}
+                      </p>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-1.5 pl-2">
+                  {/* Actions: View, Edit, Delete */}
+                  <div className="flex flex-col gap-1.5 pl-2 flex-shrink-0">
                     <Link
                       to={`/item/${item.id}`}
-                      className="text-center bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 text-gray-800 dark:text-gray-200 px-3 py-1.5 rounded-xl text-[10px] font-bold"
+                      className="text-center bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 text-gray-800 dark:text-gray-200 px-3 py-1 rounded-xl text-[10px] font-bold"
                     >
                       View
                     </Link>
                     <button
+                      onClick={() => setEditingItem(item)}
+                      className="text-center bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-xl text-[10px] font-bold transition"
+                    >
+                      Edit
+                    </button>
+                    <button
                       onClick={() => handleDeleteItem(item.id)}
-                      className="text-center bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-xl text-[10px] font-bold"
+                      className="text-center bg-red-50 hover:bg-red-100 dark:bg-red-900/30 text-red-600 px-3 py-1 rounded-xl text-[10px] font-bold transition"
                     >
                       Delete
                     </button>
@@ -228,6 +248,13 @@ export default function Profile() {
       <AdminModal
         isOpen={isAdminModalOpen}
         onClose={() => setIsAdminModalOpen(false)}
+      />
+
+      {/* Seller Edit Listing Modal */}
+      <EditItemModal
+        isOpen={Boolean(editingItem)}
+        onClose={() => setEditingItem(null)}
+        item={editingItem}
       />
     </div>
   );
