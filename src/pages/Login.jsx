@@ -83,31 +83,31 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center bg-[#f9fffb] px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md rounded-[32px] border border-gray-100 bg-white p-8 sm:p-10 shadow-soft">
+    <div className="min-h-[85vh] flex items-center justify-center bg-[#F8FAFC] dark:bg-[#0F172A] px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-8 sm:p-10 shadow-sm">
         <div className="text-center mb-8">
-          <div className="inline-flex rounded-2xl bg-green-50 p-3 text-[#00a651] mb-3">
-            <div className="rounded-xl bg-[#ffb800] px-2.5 py-1 text-xs font-black text-black">
+          <div className="inline-flex rounded-xl bg-blue-50 dark:bg-blue-900/30 p-2 text-[#2563EB] mb-3">
+            <div className="rounded-lg bg-[#2563EB] px-2.5 py-1 text-xs font-black text-white">
               SH
             </div>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#0F172A] dark:text-white tracking-tight">
             Welcome Back 👋
           </h2>
-          <p className="mt-1 text-xs sm:text-sm text-gray-500">
-            Log in to continue using SokoHub Meru
+          <p className="mt-1 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Log in to continue using SokoHub Campus Marketplace
           </p>
         </div>
 
         {error && (
-          <div className="mb-5 rounded-2xl bg-red-50 p-4 text-xs font-bold text-red-600 border border-red-100 flex items-center gap-2">
+          <div className="mb-5 rounded-xl bg-red-50 dark:bg-red-950/30 p-3.5 text-xs font-bold text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 flex items-center gap-2">
             <span>⚠️</span>
             <span>{error}</span>
           </div>
         )}
 
         {resetMessage && (
-          <div className="mb-5 rounded-2xl bg-green-50 p-4 text-xs font-bold text-[#00a651] border border-green-100 flex items-center gap-2">
+          <div className="mb-5 rounded-xl bg-blue-50 dark:bg-blue-950/30 p-3.5 text-xs font-bold text-[#2563EB] dark:text-blue-400 border border-blue-200 dark:border-blue-800 flex items-center gap-2">
             <span>✓</span>
             <span>{resetMessage}</span>
           </div>
@@ -115,7 +115,7 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-black uppercase tracking-wider text-gray-700 mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
               Email Address
             </label>
             <input
@@ -124,19 +124,19 @@ export default function Login() {
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               required
-              className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20"
+              className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-3 text-sm outline-none transition focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-slate-900 dark:text-white font-medium"
             />
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-black uppercase tracking-wider text-gray-700">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                 Password
               </label>
               <button
                 type="button"
                 onClick={handleForgotPassword}
-                className="text-xs font-bold text-[#00a651] hover:underline"
+                className="text-xs font-bold text-[#2563EB] hover:underline"
               >
                 Forgot password?
               </button>
@@ -147,14 +147,14 @@ export default function Login() {
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               required
-              className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 text-sm outline-none transition focus:border-[#00a651] focus:ring-2 focus:ring-[#00a651]/20"
+              className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-3 text-sm outline-none transition focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-slate-900 dark:text-white font-medium"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-[#00a651] hover:bg-emerald-600 py-4 text-xs sm:text-sm font-black uppercase tracking-widest text-white shadow-md transition-all hover:shadow-lg disabled:opacity-60 active:scale-98 flex items-center justify-center gap-2"
+            className="w-full rounded-xl bg-[#2563EB] hover:bg-blue-700 py-3.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-white shadow-md transition-all disabled:opacity-60 active:scale-98 flex items-center justify-center gap-2"
           >
             {loading ? "Logging in..." : "Log In"}
           </button>
@@ -162,9 +162,9 @@ export default function Login() {
 
         <div className="relative my-6 text-center">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-100"></div>
+            <div className="w-full border-t border-slate-200 dark:border-slate-700"></div>
           </div>
-          <span className="relative bg-white px-4 text-xs font-bold uppercase tracking-wider text-gray-400">
+          <span className="relative bg-white dark:bg-slate-800 px-4 text-xs font-bold uppercase tracking-wider text-slate-400">
             or continue with
           </span>
         </div>
@@ -173,7 +173,7 @@ export default function Login() {
           type="button"
           onClick={handleGoogleLogin}
           disabled={loading}
-          className="w-full rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 py-3.5 text-xs font-black uppercase tracking-wider text-gray-700 shadow-sm transition flex items-center justify-center gap-3 disabled:opacity-60"
+          className="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 shadow-sm transition flex items-center justify-center gap-3 disabled:opacity-60"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path
@@ -196,9 +196,9 @@ export default function Login() {
           Google
         </button>
 
-        <p className="mt-8 text-center text-xs font-medium text-gray-500">
+        <p className="mt-8 text-center text-xs font-medium text-slate-500 dark:text-slate-400">
           Don&apos;t have an account?{" "}
-          <Link to="/signup" className="font-black text-[#00a651] hover:underline">
+          <Link to="/signup" className="font-bold text-[#2563EB] hover:underline">
             Create account
           </Link>
         </p>

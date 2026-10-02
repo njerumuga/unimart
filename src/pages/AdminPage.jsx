@@ -82,17 +82,17 @@ export default function AdminPage() {
 
     if (!user) {
         return (
-            <div className="min-h-[70vh] flex flex-col items-center justify-center py-20 px-4 text-center">
-                <div className="w-16 h-16 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-2xl mb-4">
+            <div className="min-h-[70vh] flex flex-col items-center justify-center py-20 px-4 text-center bg-[#F8FAFC] dark:bg-[#0F172A]">
+                <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 flex items-center justify-center text-2xl mb-4">
                     🔒
                 </div>
-                <h2 className="text-2xl font-black text-gray-900 mb-2">Admin Login Required</h2>
-                <p className="text-xs text-gray-500 max-w-sm mb-6">
+                <h2 className="text-2xl font-bold text-[#0F172A] dark:text-white mb-2">Admin Login Required</h2>
+                <p className="text-xs text-slate-500 max-w-sm mb-6">
                     Please log in with an administrator account to access the moderation console.
                 </p>
                 <Link
                     to="/login"
-                    className="rounded-2xl bg-[#00a651] px-6 py-3 text-xs font-black uppercase tracking-widest text-white shadow-md hover:bg-emerald-600 transition"
+                    className="rounded-xl bg-[#2563EB] px-6 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-blue-700 transition"
                 >
                     Go to Login
                 </Link>
@@ -102,17 +102,17 @@ export default function AdminPage() {
 
     if (!isAdmin) {
         return (
-            <div className="min-h-[70vh] flex flex-col items-center justify-center py-20 px-4 text-center">
-                <div className="w-16 h-16 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-2xl mb-4">
+            <div className="min-h-[70vh] flex flex-col items-center justify-center py-20 px-4 text-center bg-[#F8FAFC] dark:bg-[#0F172A]">
+                <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 flex items-center justify-center text-2xl mb-4">
                     ⛔
                 </div>
-                <h2 className="text-2xl font-black text-gray-900 mb-2">Access Denied</h2>
-                <p className="text-xs text-gray-500 max-w-sm mb-6">
+                <h2 className="text-2xl font-bold text-[#0F172A] dark:text-white mb-2">Access Denied</h2>
+                <p className="text-xs text-slate-500 max-w-sm mb-6">
                     You do not have administrative privileges to view this page.
                 </p>
                 <Link
                     to="/"
-                    className="rounded-2xl bg-[#00a651] px-6 py-3 text-xs font-black uppercase tracking-widest text-white shadow-md hover:bg-emerald-600 transition"
+                    className="rounded-xl bg-[#2563EB] px-6 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-blue-700 transition"
                 >
                     Back to Marketplace
                 </Link>
@@ -133,55 +133,55 @@ export default function AdminPage() {
     });
 
     return (
-        <div className="min-h-screen bg-[#f9fffb] py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-6xl mx-auto space-y-8">
                 {/* Header Banner */}
-                <div className="rounded-[32px] bg-white p-6 sm:p-8 border border-gray-100 shadow-soft">
+                <div className="rounded-2xl bg-white dark:bg-slate-800 p-6 sm:p-8 border border-slate-200/80 dark:border-slate-700 shadow-sm">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center text-2xl font-black">
+                            <div className="w-14 h-14 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-[#2563EB] flex items-center justify-center text-2xl font-bold">
                                 🛡️
                             </div>
                             <div>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-red-600">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-[#2563EB] dark:text-blue-400">
                                     Administrative Portal
                                 </span>
-                                <h1 className="text-2xl font-black text-gray-900">
+                                <h1 className="text-2xl font-bold text-[#0F172A] dark:text-white">
                                     SokoHub Moderation Console
                                 </h1>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <span className="text-xs font-bold text-gray-500">
-                                Total Live: <strong className="text-[#00a651]">{approvedItems.length}</strong>
+                            <span className="text-xs font-bold text-slate-500">
+                                Total Live: <strong className="text-[#2563EB]">{approvedItems.length}</strong>
                             </span>
-                            <span className="text-gray-300">|</span>
-                            <span className="text-xs font-bold text-gray-500">
-                                Awaiting Review: <strong className="text-amber-500">{pendingItems.length}</strong>
+                            <span className="text-slate-300 dark:text-slate-600">|</span>
+                            <span className="text-xs font-bold text-slate-500">
+                                Awaiting Review: <strong className="text-[#F97316]">{pendingItems.length}</strong>
                             </span>
                         </div>
                     </div>
 
                     {/* Navigation Tabs and Search */}
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mt-6 pt-6 border-t border-gray-100">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mt-6 pt-6 border-t border-slate-100 dark:border-slate-700">
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setActiveTab("pending")}
-                                className={`px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider transition-all ${
+                                className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
                                     activeTab === "pending"
-                                        ? "bg-amber-500 text-white shadow-md scale-105"
-                                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                        ? "bg-[#F97316] text-white shadow-sm"
+                                        : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
                                 }`}
                             >
                                 🕓 Pending ({pendingItems.length})
                             </button>
                             <button
                                 onClick={() => setActiveTab("approved")}
-                                className={`px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider transition-all ${
+                                className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
                                     activeTab === "approved"
-                                        ? "bg-[#00a651] text-white shadow-md scale-105"
-                                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                        ? "bg-[#2563EB] text-white shadow-sm"
+                                        : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
                                 }`}
                             >
                                 ✅ Approved ({approvedItems.length})
@@ -194,7 +194,7 @@ export default function AdminPage() {
                                 placeholder="Search by title, seller, category..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full rounded-2xl border border-gray-200 px-4 py-2.5 text-xs outline-none transition focus:border-[#00a651]"
+                                className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2 text-xs outline-none transition focus:border-[#2563EB] text-slate-900 dark:text-white"
                             />
                         </div>
                     </div>
@@ -202,14 +202,14 @@ export default function AdminPage() {
 
                 {/* Items Grid */}
                 {itemsToShow.length === 0 ? (
-                    <div className="rounded-[32px] bg-white p-12 text-center border border-gray-100 shadow-soft">
-                        <div className="w-16 h-16 rounded-full bg-green-50 text-2xl flex items-center justify-center mx-auto mb-3">
+                    <div className="rounded-2xl bg-white dark:bg-slate-800 p-12 text-center border border-slate-200/80 dark:border-slate-700 shadow-sm">
+                        <div className="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 text-2xl flex items-center justify-center mx-auto mb-3 text-[#2563EB]">
                             🎉
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900">
+                        <h3 className="text-lg font-bold text-[#0F172A] dark:text-white">
                             {activeTab === "pending" ? "No pending items to review!" : "No approved items match search."}
                         </h3>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-slate-500 mt-1">
                             {activeTab === "pending" ? "All campus listings are currently reviewed and processed." : ""}
                         </p>
                     </div>
@@ -218,45 +218,45 @@ export default function AdminPage() {
                         {itemsToShow.map((item) => (
                             <div
                                 key={item.id}
-                                className="flex flex-col bg-white rounded-[32px] overflow-hidden border border-gray-100 shadow-soft"
+                                className="flex flex-col bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-200/80 dark:border-slate-700 shadow-sm"
                             >
-                                <div className="relative aspect-video bg-gray-100 overflow-hidden">
+                                <div className="relative aspect-video bg-slate-100 dark:bg-slate-900 overflow-hidden">
                                     <img
                                         src={item.imageUrl || "https://via.placeholder.com/400x300?text=No+Image"}
                                         alt={item.title}
                                         className="w-full h-full object-cover"
                                     />
-                                    <div className="absolute top-3 left-3 bg-black/75 text-white px-2.5 py-1 rounded-xl text-[10px] font-bold uppercase backdrop-blur-sm">
+                                    <div className="absolute top-3 left-3 bg-[#0F172A]/85 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase backdrop-blur-sm">
                                         📍 {item.locationZone || "Campus"}
                                     </div>
-                                    <div className="absolute top-3 right-3 bg-[#00a651] text-[#ffb800] px-3 py-1 rounded-xl text-xs font-black shadow-md">
+                                    <div className="absolute top-3 right-3 bg-[#0F172A] border border-slate-700 text-[#F97316] px-3 py-1 rounded-xl text-xs font-black shadow-md">
                                         KSh {Number(item.price || 0).toLocaleString()}
                                     </div>
                                 </div>
 
                                 <div className="flex flex-col flex-1 p-5 space-y-3">
                                     <div>
-                                        <div className="flex items-center justify-between text-[10px] uppercase font-bold text-gray-400 mb-1">
+                                        <div className="flex items-center justify-between text-[10px] uppercase font-bold text-slate-400 mb-1">
                                             <span>{item.category || "General"}</span>
                                             {item.condition && <span>{item.condition}</span>}
                                         </div>
-                                        <h3 className="font-bold text-gray-900 text-base line-clamp-1">
+                                        <h3 className="font-bold text-[#0F172A] dark:text-white text-base line-clamp-1">
                                             {item.title}
                                         </h3>
-                                        <p className="text-xs text-gray-600 line-clamp-2 mt-1">
+                                        <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 mt-1">
                                             {item.description || "No description."}
                                         </p>
                                     </div>
 
-                                    <div className="bg-[#f9fffb] rounded-2xl p-3 border border-green-100/60 text-xs space-y-1">
-                                        <p className="text-gray-700">
+                                    <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-3 border border-slate-200 dark:border-slate-700 text-xs space-y-1">
+                                        <p className="text-slate-700 dark:text-slate-300">
                                             <strong>Seller:</strong> {item.sellerName || item.userName || "Unknown"}
                                         </p>
-                                        <p className="text-gray-700">
+                                        <p className="text-slate-700 dark:text-slate-300">
                                             <strong>Phone:</strong> {item.sellerPhone || item.whatsapp || "None"}
                                         </p>
                                         {item.requestFeatured && (
-                                            <p className="text-amber-600 font-bold">
+                                            <p className="text-[#F97316] font-bold">
                                                 ⭐ User requested Featured placement!
                                             </p>
                                         )}
@@ -268,13 +268,13 @@ export default function AdminPage() {
                                             <div className="grid grid-cols-2 gap-2">
                                                 <button
                                                     onClick={() => handleDecision(item.id, true)}
-                                                    className="w-full rounded-xl bg-[#00a651] hover:bg-emerald-600 text-white py-2.5 text-xs font-black uppercase tracking-wider shadow-sm transition"
+                                                    className="w-full rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white py-2.5 text-xs font-bold uppercase tracking-wider shadow-sm transition"
                                                 >
                                                     ✓ Approve
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(item.id)}
-                                                    className="w-full rounded-xl bg-red-600 hover:bg-red-700 text-white py-2.5 text-xs font-black uppercase tracking-wider shadow-sm transition"
+                                                    className="w-full rounded-xl bg-red-600 hover:bg-red-700 text-white py-2.5 text-xs font-bold uppercase tracking-wider shadow-sm transition"
                                                 >
                                                     ✕ Reject
                                                 </button>
@@ -283,13 +283,13 @@ export default function AdminPage() {
                                             <div className="grid grid-cols-2 gap-2">
                                                 <button
                                                     onClick={() => handleRevoke(item.id)}
-                                                    className="w-full rounded-xl bg-amber-500 hover:bg-amber-600 text-white py-2.5 text-xs font-black uppercase tracking-wider shadow-sm transition"
+                                                    className="w-full rounded-xl bg-amber-500 hover:bg-amber-600 text-white py-2.5 text-xs font-bold uppercase tracking-wider shadow-sm transition"
                                                 >
                                                     🔁 Revoke
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(item.id)}
-                                                    className="w-full rounded-xl bg-red-600 hover:bg-red-700 text-white py-2.5 text-xs font-black uppercase tracking-wider shadow-sm transition"
+                                                    className="w-full rounded-xl bg-red-600 hover:bg-red-700 text-white py-2.5 text-xs font-bold uppercase tracking-wider shadow-sm transition"
                                                 >
                                                     🗑️ Delete
                                                 </button>
@@ -298,10 +298,10 @@ export default function AdminPage() {
 
                                         <button
                                             onClick={() => handleToggleFeatured(item.id, item.isFeatured)}
-                                            className={`w-full rounded-xl py-2 text-xs font-black uppercase tracking-wider transition ${
+                                            className={`w-full rounded-xl py-2 text-xs font-bold uppercase tracking-wider transition ${
                                                 item.isFeatured
-                                                    ? "bg-[#ffb800] text-black"
-                                                    : "bg-gray-100 text-gray-700 hover:bg-yellow-100"
+                                                    ? "bg-[#F97316] text-white"
+                                                    : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-orange-50"
                                             }`}
                                         >
                                             {item.isFeatured ? "⭐ Featured (Click to Unpin)" : "☆ Mark as Featured"}

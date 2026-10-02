@@ -17,7 +17,7 @@ import Advertise from "./pages/Advertise";
 function App() {
     return (
         <Router>
-            <div className="app-container min-h-screen flex flex-col bg-[#f9fffb] dark:bg-[#111827]">
+            <div className="app-container min-h-screen flex flex-col bg-[#F8FAFC] dark:bg-[#0F172A]">
                 <Navbar />
                 <main className="content flex-1">
                     <Routes>

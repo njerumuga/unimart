@@ -42,43 +42,43 @@ export default function ItemCard({ item, isSellerView = false }) {
   const itemDetailUrl = itemId ? `/item/${itemId}` : sellerId ? `/seller/${sellerId}` : "#";
 
   return (
-    <div className="group flex flex-col bg-white rounded-[32px] overflow-hidden transition-all duration-500 hover:shadow-2xl border-2 border-transparent hover:border-[#00a651] h-full shadow-soft">
-      {/* Clickable Image */}
-      <Link to={itemDetailUrl} className="relative aspect-square m-2 overflow-hidden rounded-[24px] block bg-gray-50">
+    <div className="group flex flex-col bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-200/80 dark:border-slate-700/80 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 h-full">
+      {/* Clickable Image with Standard Aspect Ratio */}
+      <Link to={itemDetailUrl} className="relative aspect-square m-2 overflow-hidden rounded-xl block bg-slate-100 dark:bg-slate-900">
         <img
           src={imageUrl}
           alt={item?.title || "Item"}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         
         {/* Location Badge Overlay */}
-        <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-xl text-[10px] font-bold uppercase backdrop-blur-sm">
+        <div className="absolute top-3 left-3 bg-[#0F172A]/85 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase backdrop-blur-sm shadow-sm">
           📍 {locationZone}
         </div>
 
         {/* Price Tag Pill */}
-        <div className="absolute top-4 right-4">
-          <div className="bg-[#00a651] text-[#ffb800] px-3.5 py-1.5 rounded-2xl shadow-lg">
-            <p className="font-black text-xs sm:text-sm">
+        <div className="absolute top-3 right-3">
+          <div className="bg-[#0F172A] text-white border border-slate-700/80 px-3 py-1 rounded-xl shadow-md">
+            <p className="font-black text-xs sm:text-sm text-[#F97316]">
               KSh {Number(item?.price || 0).toLocaleString()}
             </p>
           </div>
         </div>
 
         {/* Media Badges */}
-        <div className="absolute bottom-4 left-4 flex flex-wrap gap-1.5">
+        <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
           {item?.isFeatured && (
-            <span className="bg-[#ffb800] text-black text-[10px] font-black uppercase px-2.5 py-1 rounded-xl shadow-md">
+            <span className="bg-[#F97316] text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-lg shadow-sm">
               ⭐ Featured
             </span>
           )}
           {hasVideo && (
-            <span className="bg-red-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-lg shadow-md flex items-center gap-1">
+            <span className="bg-red-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-lg shadow-sm flex items-center gap-1">
               <span>▶</span> Video
             </span>
           )}
           {mediaCount > 1 && !hasVideo && (
-            <span className="bg-black/75 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded-lg shadow-md">
+            <span className="bg-[#0F172A]/85 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded-lg shadow-sm">
               📷 {mediaCount}
             </span>
           )}
@@ -86,20 +86,20 @@ export default function ItemCard({ item, isSellerView = false }) {
       </Link>
 
       {/* Content Section */}
-      <div className="flex flex-col flex-1 p-6 pt-2 space-y-4">
+      <div className="flex flex-col flex-1 p-4 pt-1 space-y-3">
         <div>
           <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] uppercase tracking-widest font-black text-[#00a651]">
+            <p className="text-[10px] uppercase tracking-wider font-bold text-[#2563EB] dark:text-blue-400">
               {item?.category || "Listing"}
             </p>
             {item?.condition && (
-              <span className="text-[9px] font-bold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full uppercase">
+              <span className="text-[9px] font-semibold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-md uppercase">
                 {item.condition}
               </span>
             )}
           </div>
-          <Link to={itemDetailUrl} className="block group-hover:text-[#00a651] transition-colors">
-            <h3 className="text-lg font-bold text-gray-900 line-clamp-1">
+          <Link to={itemDetailUrl} className="block group-hover:text-[#2563EB] transition-colors">
+            <h3 className="text-sm sm:text-base font-bold text-[#0F172A] dark:text-white line-clamp-1">
               {item?.title || "Untitled Item"}
             </h3>
           </Link>
@@ -110,48 +110,48 @@ export default function ItemCard({ item, isSellerView = false }) {
           {sellerId ? (
             <Link 
               to={`/seller/${sellerId}`} 
-              className="flex items-center gap-2 group/seller hover:opacity-80 transition-opacity"
+              className="flex items-center gap-2 group/seller hover:opacity-90 transition-opacity"
             >
-              <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center text-[9px] font-black text-[#00a651] group-hover/seller:bg-[#00a651] group-hover/seller:text-white transition-colors">
+              <div className="h-6 w-6 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-[10px] font-bold text-[#2563EB] group-hover/seller:bg-[#2563EB] group-hover/seller:text-white transition-colors">
                 {firstName.charAt(0).toUpperCase()}
               </div>
-              <span className="text-xs font-bold text-gray-600 group-hover/seller:text-[#00a651] group-hover/seller:underline transition-colors truncate max-w-[100px]">
+              <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 group-hover/seller:text-[#2563EB] transition-colors truncate max-w-[90px]">
                 {firstName}
               </span>
             </Link>
           ) : (
             <div className="flex items-center gap-2">
-              <div className="h-6 w-6 rounded-full bg-gray-100 flex items-center justify-center text-[9px] font-black text-gray-500">
+              <div className="h-6 w-6 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-500">
                 S
               </div>
-              <span className="text-xs font-bold text-gray-500 truncate max-w-[100px]">{firstName}</span>
+              <span className="text-xs font-semibold text-slate-500 truncate max-w-[90px]">{firstName}</span>
             </div>
           )}
 
           <TrustBadge type="verified" text="Verified" />
         </div>
 
-        {/* Action Button */}
+        {/* High-Action CTA Button */}
         <div className="mt-auto pt-2">
           {isSellerView ? (
             <button 
               onClick={handleWhatsAppClick}
-              className="w-full bg-[#00a651] text-white py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all hover:bg-emerald-600 shadow-md active:scale-95 flex items-center justify-center gap-1.5"
+              className="w-full bg-[#F97316] hover:bg-[#EA580C] text-white py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-sm active:scale-95 flex items-center justify-center gap-1.5"
             >
-              <span>💬</span> Chat on WhatsApp
+              <span>💬</span> WhatsApp Vendor
             </button>
           ) : (
             <div className="grid grid-cols-2 gap-2">
               <Link to={itemDetailUrl} className="w-full">
-                <button className="w-full bg-[#f9fffb] hover:bg-green-50 text-[#00a651] border border-green-200 py-3 rounded-2xl text-[11px] font-black uppercase tracking-wider transition shadow-sm active:scale-95">
+                <button className="w-full bg-slate-50 hover:bg-slate-100 dark:bg-slate-700/60 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-600 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition shadow-sm active:scale-95">
                   View
                 </button>
               </Link>
               <button 
                 onClick={handleWhatsAppClick}
-                className="w-full bg-[#00a651] text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all hover:bg-emerald-600 shadow-sm active:scale-95"
+                className="w-full bg-[#F97316] hover:bg-[#EA580C] text-white py-2.5 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all shadow-sm active:scale-95 flex items-center justify-center gap-1"
               >
-                WhatsApp
+                <span>💬</span> WhatsApp
               </button>
             </div>
           )}

@@ -147,21 +147,21 @@ export default function SellerProfile() {
   });
 
   return (
-    <div className="min-h-screen bg-[#f9fffb] dark:bg-[#111827] pb-24">
-      {/* Top Green Bar */}
-      <div className="bg-[#00a651] text-white px-4 py-4 sm:px-6 md:px-12 flex items-center justify-between">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] pb-24">
+      {/* Top Midnight Bar */}
+      <div className="bg-[#0F172A] text-white px-4 py-4 sm:px-6 md:px-12 flex items-center justify-between border-b border-slate-800">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate(-1)}
-            className="p-1 rounded-full hover:bg-white/10 transition"
+            className="p-1.5 rounded-full hover:bg-slate-800 transition"
             title="Go Back"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
           </button>
-          <h1 className="text-lg sm:text-xl font-black tracking-tight truncate">
-            {sellerName || "Seller Storefront"}
+          <h1 className="text-base sm:text-lg font-bold tracking-tight truncate">
+            {sellerName || "Vendor Storefront"}
           </h1>
         </div>
 
@@ -169,7 +169,7 @@ export default function SellerProfile() {
           {/* Share Button */}
           <button
             onClick={handleShare}
-            className="p-1.5 rounded-full hover:bg-white/10 text-white transition"
+            className="p-1.5 rounded-full hover:bg-slate-800 text-slate-300 hover:text-white transition"
             title="Share Storefront"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,20 +181,21 @@ export default function SellerProfile() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-12 py-6 space-y-6">
         {/* Seller Info Card */}
-        <div className="rounded-[24px] bg-white dark:bg-[#1f2937] p-5 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="rounded-2xl bg-white dark:bg-slate-800 p-5 sm:p-6 border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-2">
-            <h2 className="text-xl font-black text-gray-900 dark:text-white">
-              {sellerName || "Campus Seller"}
+            <h2 className="text-xl font-bold text-[#0F172A] dark:text-white">
+              {sellerName || "Campus Vendor"}
             </h2>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="rounded-lg bg-green-100 text-[#00a651] px-2.5 py-0.5 text-xs font-bold">
-                ✓ Verified Seller
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-[#2563EB] dark:text-blue-300 border border-blue-200/60 dark:border-blue-800 px-2.5 py-0.5 text-xs font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] animate-pulse"></span>
+                <span>Verified Vendor</span>
               </span>
-              <span className="rounded-lg bg-emerald-50 text-emerald-800 px-2.5 py-0.5 text-xs font-bold">
+              <span className="rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2.5 py-0.5 text-xs font-medium">
                 Main Campus
               </span>
             </div>
-            <p className="text-xs font-bold text-gray-500 dark:text-gray-400 pt-1">
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 pt-0.5">
               {sellerItems.length} Active Listing(s)
             </p>
           </div>
@@ -202,50 +203,50 @@ export default function SellerProfile() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsFollowing(!isFollowing)}
-              className={`rounded-2xl px-5 py-2.5 text-xs font-black transition-all ${
+              className={`rounded-xl px-5 py-2.5 text-xs font-bold transition-all ${
                 isFollowing
-                  ? "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-                  : "bg-[#00a651] hover:bg-emerald-600 text-white shadow-sm"
+                  ? "bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200"
+                  : "bg-[#2563EB] hover:bg-blue-700 text-white shadow-sm"
               }`}
             >
-              {isFollowing ? "✓ Following" : "Follow Seller"}
+              {isFollowing ? "✓ Following" : "Follow Vendor"}
             </button>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="rounded-2xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-5 py-2.5 text-xs font-bold transition-all shadow-sm"
+              className="rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-5 py-2.5 text-xs font-bold transition-all shadow-sm"
             >
-              Rate Seller
+              Rate Vendor
             </button>
           </div>
         </div>
 
         {/* Search Bar */}
         <div>
-          <div className="relative flex items-center bg-white dark:bg-[#1f2937] rounded-2xl border border-gray-300 dark:border-gray-700 p-2 shadow-sm">
-            <span className="pl-3 pr-2 text-gray-400 text-sm">🔍</span>
+          <div className="relative flex items-center bg-white dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-slate-700 p-2 shadow-sm focus-within:ring-2 focus-within:ring-[#2563EB]">
+            <span className="pl-3 pr-2 text-slate-400 text-sm">🔍</span>
             <input
               type="text"
-              placeholder={`Search in ${sellerName ? sellerName + "'s" : "seller's"} shop...`}
+              placeholder={`Search in ${sellerName ? sellerName + "'s" : "vendor's"} shop...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-transparent text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200 outline-none"
+              className="w-full bg-transparent text-xs sm:text-sm font-semibold text-slate-900 dark:text-white outline-none"
             />
           </div>
         </div>
 
         {/* Items Section */}
         <div className="space-y-4">
-          <h3 className="text-sm font-black text-[#00a651] dark:text-[#22c55e]">
-            Items Listed by Seller
+          <h3 className="text-sm font-bold text-[#0F172A] dark:text-white uppercase tracking-wider">
+            Items Listed by Vendor
           </h3>
 
           {loading ? (
             <div className="py-12 text-center">
-              <div className="w-8 h-8 border-4 border-[#00a651] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-              <p className="text-xs font-bold text-gray-400">Loading products...</p>
+              <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+              <p className="text-xs font-bold text-slate-400">Loading products...</p>
             </div>
           ) : filteredItems.length === 0 ? (
-            <div className="py-12 text-center text-xs text-gray-500">
+            <div className="py-12 text-center text-xs text-slate-500">
               No items match your search in this store.
             </div>
           ) : (
@@ -262,10 +263,10 @@ export default function SellerProfile() {
                 return (
                   <div
                     key={item.id}
-                    className="flex flex-col bg-white dark:bg-[#1f2937] rounded-[24px] overflow-hidden border border-gray-200 dark:border-gray-700 p-3 shadow-sm hover:shadow-md transition-all justify-between"
+                    className="flex flex-col bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-200/80 dark:border-slate-700 p-3 shadow-sm hover:shadow-md transition-all justify-between"
                   >
                     <Link to={`/item/${item.id}`} className="block space-y-2">
-                      <div className="aspect-square rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+                      <div className="aspect-square rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900">
                         <img
                           src={item.imageUrl || "https://via.placeholder.com/300"}
                           alt={item.title}
@@ -274,30 +275,30 @@ export default function SellerProfile() {
                       </div>
 
                       <div>
-                        <h4 className="text-xs font-black text-gray-900 dark:text-white line-clamp-1">
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-white line-clamp-1">
                           {item.title}
                         </h4>
-                        <p className="text-xs font-black text-[#00a651] mt-0.5">
+                        <p className="text-xs font-black text-[#F97316] mt-0.5">
                           KSh {Number(item.price || 0).toLocaleString()}
                         </p>
                       </div>
                     </Link>
 
-                    {/* WhatsApp and Call Buttons */}
+                    {/* WhatsApp and Call Buttons (High-Action Orange CTA) */}
                     <div className="grid grid-cols-2 gap-1.5 pt-3 mt-auto">
                       {waUrl ? (
                         <a
                           href={waUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="w-full text-center rounded-xl bg-[#00a651] hover:bg-emerald-600 text-white py-2 text-[10px] font-black uppercase transition shadow-sm"
+                          className="w-full text-center rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white py-2 text-[10px] font-black uppercase transition shadow-sm"
                         >
                           WHATSAPP
                         </a>
                       ) : (
                         <button
                           disabled
-                          className="w-full text-center rounded-xl bg-gray-200 text-gray-400 py-2 text-[10px] font-black uppercase"
+                          className="w-full text-center rounded-xl bg-slate-200 text-slate-400 py-2 text-[10px] font-bold uppercase"
                         >
                           WHATSAPP
                         </button>
@@ -306,14 +307,14 @@ export default function SellerProfile() {
                       {phone ? (
                         <a
                           href={`tel:${phone}`}
-                          className="w-full text-center rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 text-gray-700 dark:text-gray-300 py-2 text-[10px] font-black uppercase transition shadow-sm"
+                          className="w-full text-center rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-slate-50 text-slate-700 dark:text-slate-300 py-2 text-[10px] font-bold uppercase transition shadow-sm"
                         >
                           CALL
                         </a>
                       ) : (
                         <button
                           disabled
-                          className="w-full text-center rounded-xl border border-gray-200 bg-gray-100 text-gray-400 py-2 text-[10px] font-black uppercase"
+                          className="w-full text-center rounded-xl border border-slate-200 bg-slate-100 text-slate-400 py-2 text-[10px] font-bold uppercase"
                         >
                           CALL
                         </button>
@@ -328,15 +329,15 @@ export default function SellerProfile() {
 
         {/* Customer Reviews Section */}
         {reviews.length > 0 && (
-          <div className="rounded-[24px] bg-white dark:bg-[#1f2937] p-6 border border-gray-200 dark:border-gray-700 shadow-sm space-y-4">
-            <h3 className="text-base font-black text-gray-900 dark:text-white">
+          <div className="rounded-2xl bg-white dark:bg-slate-800 p-6 border border-slate-200/80 dark:border-slate-700 shadow-sm space-y-4">
+            <h3 className="text-base font-bold text-[#0F172A] dark:text-white">
               Customer Reviews ({reviews.length})
             </h3>
             <div className="space-y-3">
               {reviews.map((rev) => (
                 <div
                   key={rev.id}
-                  className="rounded-2xl bg-[#f9fffb] dark:bg-[#1a2e22] p-4 border border-green-100 dark:border-green-800 text-xs space-y-1.5"
+                  className="rounded-xl bg-slate-50 dark:bg-slate-900/50 p-4 border border-slate-200 dark:border-slate-700 text-xs space-y-1.5"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-gray-800 dark:text-gray-200">

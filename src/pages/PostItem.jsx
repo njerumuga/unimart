@@ -34,19 +34,19 @@ export default function PostItem() {
 
   if (!user) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-16 text-center">
-        <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center text-3xl mb-4">
+      <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 py-16 text-center bg-[#F8FAFC] dark:bg-[#0F172A]">
+        <div className="w-20 h-20 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-3xl mb-4 text-[#2563EB]">
           📝
         </div>
-        <h2 className="text-2xl font-black text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold text-[#0F172A] dark:text-white mb-2">
           Log in to Post an Item
         </h2>
-        <p className="text-sm text-gray-500 max-w-sm mb-6">
-          Connect with thousands of students and buyers across Meru University and surrounding campus hostels.
+        <p className="text-sm text-slate-500 max-w-sm mb-6">
+          Connect with thousands of students and buyers across Meru campus and surrounding student hostels.
         </p>
         <Link
           to="/login"
-          className="rounded-2xl bg-[#00a651] px-8 py-3.5 text-xs font-black uppercase tracking-widest text-white shadow-md hover:bg-emerald-600 transition"
+          className="rounded-xl bg-[#2563EB] px-8 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-blue-700 transition"
         >
           Go to Login
         </Link>
@@ -170,26 +170,27 @@ export default function PostItem() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9fffb] dark:bg-[#111827] pb-24">
-      {/* Top Green Banner */}
-      <div className="bg-[#00a651] text-white px-4 py-6 sm:px-6 md:px-12">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] pb-24">
+      {/* Top Midnight Blue Banner */}
+      <div className="bg-[#0F172A] text-white px-4 py-6 sm:px-6 md:px-12 border-b border-slate-800">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
             Post New Listing
           </h1>
+          <p className="text-xs text-slate-400 mt-0.5">Reach thousands of active campus students</p>
         </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6">
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5 bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm">
           {/* Photos Header */}
-          <div className="flex items-center justify-between text-xs font-bold text-gray-700 dark:text-gray-300">
+          <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
             <span>Product Photos ({files.length}/8)</span>
-            <span className="text-gray-400">Up to 8 photos</span>
+            <span className="text-slate-400">Up to 8 photos</span>
           </div>
 
           {/* Photo Dropzone Box */}
-          <div className="rounded-[24px] border-2 border-[#00a651]/40 bg-[#eaf7ee] dark:bg-[#1a2e22] p-6 text-center hover:border-[#00a651] transition">
+          <div className="rounded-xl border-2 border-dashed border-[#2563EB]/40 bg-blue-50/40 dark:bg-blue-950/20 p-6 text-center hover:border-[#2563EB] transition">
             <input
               type="file"
               id="product-photo-upload"
@@ -200,12 +201,12 @@ export default function PostItem() {
             />
             <label
               htmlFor="product-photo-upload"
-              className="cursor-pointer space-y-1 block py-3"
+              className="cursor-pointer space-y-1 block py-2"
             >
-              <p className="text-xs sm:text-sm font-black text-[#00a651] flex items-center justify-center gap-1.5">
-                <span>📸</span> + Select Product Photos (Up to 8)
+              <p className="text-xs sm:text-sm font-bold text-[#2563EB] dark:text-blue-400 flex items-center justify-center gap-1.5">
+                <span>📸</span> + Select Product Photos / Videos (Up to 8)
               </p>
-              <p className="text-[11px] font-semibold text-gray-500 dark:text-gray-400">
+              <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                 Show multiple photos and usage angles
               </p>
             </label>
@@ -217,7 +218,7 @@ export default function PostItem() {
               {files.map((item, index) => (
                 <div
                   key={item.id}
-                  className="group relative aspect-square rounded-2xl overflow-hidden bg-black/5 border-2 border-gray-200 dark:border-gray-700 hover:border-[#00a651]"
+                  className="group relative aspect-square rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-[#2563EB]"
                 >
                   {item.type === "video" ? (
                     <div className="w-full h-full relative bg-black flex items-center justify-center">
@@ -242,14 +243,14 @@ export default function PostItem() {
 
                   <div className="absolute top-1.5 left-1.5 flex flex-col gap-1">
                     {index === 0 ? (
-                      <span className="bg-[#00a651] text-white text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md">
+                      <span className="bg-[#2563EB] text-white text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-md">
                         Cover
                       </span>
                     ) : (
                       <button
                         type="button"
                         onClick={() => handleSetCover(index)}
-                        className="bg-black/70 hover:bg-[#00a651] text-white text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-md"
+                        className="bg-[#0F172A]/80 hover:bg-[#2563EB] text-white text-[8px] font-bold uppercase px-1.5 py-0.5 rounded-md"
                       >
                         Set Cover
                       </button>
@@ -277,7 +278,7 @@ export default function PostItem() {
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 required
-                className="w-full rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-3.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white outline-none focus:border-[#00a651]"
+                className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-3 text-xs sm:text-sm font-semibold text-slate-900 dark:text-white outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
               />
             </div>
           </div>
@@ -293,20 +294,20 @@ export default function PostItem() {
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
                 required
                 min="0"
-                className="w-full rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-3.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white outline-none focus:border-[#00a651]"
+                className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-3 text-xs sm:text-sm font-semibold text-slate-900 dark:text-white outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
               />
             </div>
           </div>
 
           {/* Condition Dropdown */}
           <div className="relative">
-            <span className="absolute -top-2.5 left-4 bg-white dark:bg-gray-800 px-1 text-[10px] font-bold text-gray-500">
+            <span className="absolute -top-2.5 left-4 bg-white dark:bg-slate-800 px-1 text-[10px] font-bold text-slate-500">
               Condition *
             </span>
             <select
               value={form.condition}
               onChange={(e) => setForm({ ...form, condition: e.target.value })}
-              className="w-full rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-3.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white outline-none focus:border-[#00a651] appearance-none"
+              className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-3 text-xs sm:text-sm font-semibold text-slate-900 dark:text-white outline-none focus:border-[#2563EB] appearance-none"
             >
               {conditions.map((cond) => (
                 <option key={cond} value={cond}>
@@ -314,20 +315,20 @@ export default function PostItem() {
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-500">
+            <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-500">
               ▼
             </div>
           </div>
 
           {/* Category Dropdown */}
           <div className="relative">
-            <span className="absolute -top-2.5 left-4 bg-white dark:bg-gray-800 px-1 text-[10px] font-bold text-[#00a651]">
+            <span className="absolute -top-2.5 left-4 bg-white dark:bg-slate-800 px-1 text-[10px] font-bold text-[#2563EB]">
               Category *
             </span>
             <select
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
-              className="w-full rounded-2xl border-2 border-[#00a651] bg-white dark:bg-gray-800 px-4 py-3.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white outline-none appearance-none"
+              className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-3 text-xs sm:text-sm font-semibold text-slate-900 dark:text-white outline-none focus:border-[#2563EB] appearance-none"
             >
               {categories.map((cat) => (
                 <option key={cat} value={cat}>
@@ -335,20 +336,20 @@ export default function PostItem() {
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-[#00a651]">
-              ▲
+            <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-[#2563EB]">
+              ▼
             </div>
           </div>
 
           {/* Campus Zone Dropdown */}
           <div className="relative">
-            <span className="absolute -top-2.5 left-4 bg-white dark:bg-gray-800 px-1 text-[10px] font-bold text-[#00a651]">
+            <span className="absolute -top-2.5 left-4 bg-white dark:bg-slate-800 px-1 text-[10px] font-bold text-[#2563EB]">
               Campus Zone *
             </span>
             <select
               value={form.locationZone}
               onChange={(e) => setForm({ ...form, locationZone: e.target.value })}
-              className="w-full rounded-2xl border-2 border-[#00a651] bg-white dark:bg-gray-800 px-4 py-3.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white outline-none appearance-none"
+              className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-3 text-xs sm:text-sm font-semibold text-slate-900 dark:text-white outline-none focus:border-[#2563EB] appearance-none"
             >
               {locations.map((loc) => (
                 <option key={loc} value={loc}>
@@ -356,7 +357,7 @@ export default function PostItem() {
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-[#00a651]">
+            <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-[#2563EB]">
               ▼
             </div>
           </div>
@@ -370,7 +371,7 @@ export default function PostItem() {
                 value={form.sellerPhone}
                 onChange={(e) => setForm({ ...form, sellerPhone: e.target.value })}
                 required
-                className="w-full rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-3.5 text-xs sm:text-sm font-bold text-gray-900 dark:text-white outline-none focus:border-[#00a651]"
+                className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-3 text-xs sm:text-sm font-semibold text-slate-900 dark:text-white outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]"
               />
             </div>
           </div>
@@ -384,26 +385,26 @@ export default function PostItem() {
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 rows="3"
-                className="w-full rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-3 text-xs sm:text-sm font-medium text-gray-900 dark:text-white outline-none focus:border-[#00a651]"
+                className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-3 text-xs sm:text-sm font-medium text-slate-900 dark:text-white outline-none focus:border-[#2563EB]"
               />
             </div>
           </div>
 
           {/* Upload Status Alert */}
           {uploadStatus && (
-            <div className="p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-[#00a651] rounded-2xl text-xs font-bold flex items-center gap-2">
-              <div className="w-3.5 h-3.5 border-2 border-[#00a651] border-t-transparent rounded-full animate-spin"></div>
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-[#2563EB] dark:text-blue-300 rounded-xl text-xs font-bold flex items-center gap-2">
+              <div className="w-3.5 h-3.5 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin"></div>
               <span>{uploadStatus}</span>
             </div>
           )}
 
-          {/* Submit Button */}
+          {/* High-Action Submit Button in Energetic Orange */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-[#00a651] hover:bg-emerald-600 py-4 text-xs sm:text-sm font-black uppercase tracking-widest text-white shadow-lg transition-all active:scale-98 disabled:opacity-50"
+            className="w-full rounded-xl bg-[#F97316] hover:bg-[#EA580C] py-3.5 text-xs sm:text-sm font-black uppercase tracking-wider text-white shadow-md hover:shadow-lg transition-all active:scale-98 disabled:opacity-50"
           >
-            {loading ? "Posting..." : "Post Listing"}
+            {loading ? "Posting..." : "Post Listing & Notify Admin"}
           </button>
         </form>
       </div>

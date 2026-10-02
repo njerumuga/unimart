@@ -106,17 +106,17 @@ export default function AdminModal({ isOpen, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-fadeIn">
       <div 
-        className="relative w-full max-w-lg rounded-[32px] bg-[#f0ecf4] dark:bg-[#1f2937] p-6 sm:p-8 shadow-2xl transition-all max-h-[90vh] flex flex-col"
+        className="relative w-full max-w-lg rounded-2xl bg-white dark:bg-slate-800 p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-700 transition-all max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-3">
-          <h3 className="text-lg font-black text-gray-900 dark:text-white flex items-center gap-2">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
+          <h3 className="text-base font-bold text-[#0F172A] dark:text-white flex items-center gap-2">
             <span>⚙️</span> SokoHub Admin Panel
           </h3>
           <button
             onClick={onClose}
-            className="rounded-full p-1.5 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+            className="rounded-full p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
@@ -125,33 +125,33 @@ export default function AdminModal({ isOpen, onClose }) {
         </div>
 
         {/* Tab Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-t-2xl px-2">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 rounded-t-xl px-2 mt-3">
           <button
             onClick={() => setActiveTab("pending")}
-            className={`flex-1 py-3 text-xs font-bold transition-all border-b-2 text-center ${
+            className={`flex-1 py-2.5 text-xs font-bold transition-all border-b-2 text-center ${
               activeTab === "pending"
-                ? "border-[#00a651] text-[#00a651] font-black"
-                : "border-transparent text-gray-600 hover:text-gray-900 dark:text-gray-300"
+                ? "border-[#2563EB] text-[#2563EB] dark:text-blue-400 font-black"
+                : "border-transparent text-slate-600 hover:text-slate-900 dark:text-slate-400"
             }`}
           >
             Pending ({pendingItems.length})
           </button>
           <button
             onClick={() => setActiveTab("featured")}
-            className={`flex-1 py-3 text-xs font-bold transition-all border-b-2 text-center ${
+            className={`flex-1 py-2.5 text-xs font-bold transition-all border-b-2 text-center ${
               activeTab === "featured"
-                ? "border-[#00a651] text-[#00a651] font-black"
-                : "border-transparent text-gray-600 hover:text-gray-900 dark:text-gray-300"
+                ? "border-[#2563EB] text-[#2563EB] dark:text-blue-400 font-black"
+                : "border-transparent text-slate-600 hover:text-slate-900 dark:text-slate-400"
             }`}
           >
             Featured ({featuredItems.length})
           </button>
           <button
             onClick={() => setActiveTab("banner")}
-            className={`flex-1 py-3 text-xs font-bold transition-all border-b-2 text-center ${
+            className={`flex-1 py-2.5 text-xs font-bold transition-all border-b-2 text-center ${
               activeTab === "banner"
-                ? "border-[#00a651] text-[#00a651] font-black"
-                : "border-transparent text-gray-600 hover:text-gray-900 dark:text-gray-300"
+                ? "border-[#2563EB] text-[#2563EB] dark:text-blue-400 font-black"
+                : "border-transparent text-slate-600 hover:text-slate-900 dark:text-slate-400"
             }`}
           >
             Post Banner
@@ -159,12 +159,12 @@ export default function AdminModal({ isOpen, onClose }) {
         </div>
 
         {/* Tab Content Body */}
-        <div className="flex-1 overflow-y-auto py-5 px-1 space-y-4">
+        <div className="flex-1 overflow-y-auto py-4 px-1 space-y-4">
           {activeTab === "pending" && (
             <div>
               {pendingItems.length === 0 ? (
                 <div className="py-12 text-center space-y-2">
-                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                  <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                     No pending listings requiring approval right now. All caught up!
                   </p>
                 </div>
@@ -173,37 +173,37 @@ export default function AdminModal({ isOpen, onClose }) {
                   {pendingItems.map((item) => (
                     <div
                       key={item.id}
-                      className="rounded-2xl bg-white dark:bg-gray-800 p-4 border border-gray-100 dark:border-gray-700 shadow-sm space-y-3"
+                      className="rounded-xl bg-slate-50 dark:bg-slate-900/60 p-4 border border-slate-200 dark:border-slate-700 shadow-sm space-y-3"
                     >
                       <div className="flex items-center gap-3">
                         <img
                           src={item.imageUrl || "https://via.placeholder.com/100"}
                           alt={item.title}
-                          className="w-14 h-14 rounded-xl object-cover bg-gray-100"
+                          className="w-14 h-14 rounded-xl object-cover bg-slate-200"
                         />
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-xs font-black text-gray-900 dark:text-white truncate">
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
                             {item.title}
                           </h4>
-                          <p className="text-[11px] font-bold text-[#00a651]">
+                          <p className="text-[11px] font-bold text-[#2563EB] dark:text-blue-400">
                             KSh {Number(item.price || 0).toLocaleString()} • {item.category}
                           </p>
-                          <p className="text-[10px] text-gray-500 truncate">
+                          <p className="text-[10px] text-slate-500 truncate">
                             Seller: {item.sellerName || "User"} (📍 {item.locationZone})
                           </p>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 pt-1 border-t border-gray-100 dark:border-gray-700">
+                      <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-200 dark:border-slate-700">
                         <button
                           onClick={() => handleDecision(item.id, true)}
-                          className="w-full rounded-xl bg-[#00a651] hover:bg-emerald-600 text-white py-2 text-[11px] font-black uppercase tracking-wider transition shadow-sm"
+                          className="w-full rounded-xl bg-[#2563EB] hover:bg-blue-700 text-white py-2 text-[11px] font-bold uppercase tracking-wider transition shadow-sm"
                         >
                           ✓ Approve
                         </button>
                         <button
                           onClick={() => handleDelete(item.id)}
-                          className="w-full rounded-xl bg-red-600 hover:bg-red-700 text-white py-2 text-[11px] font-black uppercase tracking-wider transition shadow-sm"
+                          className="w-full rounded-xl bg-red-600 hover:bg-red-700 text-white py-2 text-[11px] font-bold uppercase tracking-wider transition shadow-sm"
                         >
                           ✕ Reject
                         </button>
@@ -219,7 +219,7 @@ export default function AdminModal({ isOpen, onClose }) {
             <div>
               {featuredItems.length === 0 ? (
                 <div className="py-12 text-center space-y-2">
-                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                  <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                     No active featured items at the moment.
                   </p>
                 </div>
@@ -228,19 +228,19 @@ export default function AdminModal({ isOpen, onClose }) {
                   {featuredItems.map((item) => (
                     <div
                       key={item.id}
-                      className="rounded-2xl bg-white dark:bg-gray-800 p-4 border border-gray-100 dark:border-gray-700 shadow-sm flex items-center justify-between gap-3"
+                      className="rounded-xl bg-slate-50 dark:bg-slate-900/60 p-4 border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between gap-3"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <img
                           src={item.imageUrl || "https://via.placeholder.com/100"}
                           alt={item.title}
-                          className="w-12 h-12 rounded-xl object-cover bg-gray-100"
+                          className="w-12 h-12 rounded-xl object-cover bg-slate-200"
                         />
                         <div className="min-w-0">
-                          <h4 className="text-xs font-black text-gray-900 dark:text-white truncate">
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
                             {item.title}
                           </h4>
-                          <p className="text-[11px] font-bold text-[#ffb800]">
+                          <p className="text-[11px] font-bold text-[#F97316]">
                             KSh {Number(item.price || 0).toLocaleString()}
                           </p>
                         </div>
@@ -248,7 +248,7 @@ export default function AdminModal({ isOpen, onClose }) {
 
                       <button
                         onClick={() => handleToggleFeatured(item.id, item.isFeatured)}
-                        className="rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 px-3 py-1.5 text-[10px] font-bold uppercase transition"
+                        className="rounded-xl bg-orange-100 hover:bg-orange-200 text-orange-900 px-3 py-1.5 text-[10px] font-bold uppercase transition"
                       >
                         Unpin
                       </button>
@@ -261,7 +261,7 @@ export default function AdminModal({ isOpen, onClose }) {
 
           {activeTab === "banner" && (
             <form onSubmit={handlePublishBanner} className="space-y-3">
-              <p className="text-[11px] font-bold text-gray-600 dark:text-gray-300">
+              <p className="text-[11px] font-bold text-slate-600 dark:text-slate-300">
                 Post Campus Ad / Business Spotlight Banner
               </p>
 
@@ -272,7 +272,7 @@ export default function AdminModal({ isOpen, onClose }) {
                   value={bannerForm.title}
                   onChange={(e) => setBannerForm({ ...bannerForm, title: e.target.value })}
                   required
-                  className="w-full rounded-2xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-3 text-xs font-medium outline-none focus:border-[#00a651]"
+                  className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2.5 text-xs font-medium outline-none focus:border-[#2563EB]"
                 />
               </div>
 
@@ -283,7 +283,7 @@ export default function AdminModal({ isOpen, onClose }) {
                   onChange={(e) => setBannerForm({ ...bannerForm, details: e.target.value })}
                   required
                   rows="3"
-                  className="w-full rounded-2xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-3 text-xs font-medium outline-none focus:border-[#00a651]"
+                  className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2.5 text-xs font-medium outline-none focus:border-[#2563EB]"
                 />
               </div>
 
@@ -293,7 +293,7 @@ export default function AdminModal({ isOpen, onClose }) {
                   placeholder="Contact Phone"
                   value={bannerForm.phone}
                   onChange={(e) => setBannerForm({ ...bannerForm, phone: e.target.value })}
-                  className="w-full rounded-2xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-3 text-xs font-medium outline-none focus:border-[#00a651]"
+                  className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2.5 text-xs font-medium outline-none focus:border-[#2563EB]"
                 />
               </div>
 
@@ -303,14 +303,14 @@ export default function AdminModal({ isOpen, onClose }) {
                   placeholder="Image URL"
                   value={bannerForm.imageUrl}
                   onChange={(e) => setBannerForm({ ...bannerForm, imageUrl: e.target.value })}
-                  className="w-full rounded-2xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-3 text-xs font-medium outline-none focus:border-[#00a651]"
+                  className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2.5 text-xs font-medium outline-none focus:border-[#2563EB]"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={bannerSubmitting}
-                className="w-full rounded-2xl bg-[#00a651] hover:bg-emerald-600 text-white py-3.5 text-xs font-black uppercase tracking-wider shadow-md transition disabled:opacity-50"
+                className="w-full rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white py-3 text-xs font-black uppercase tracking-wider shadow-md transition disabled:opacity-50"
               >
                 {bannerSubmitting ? "Publishing..." : "Publish Ad Banner"}
               </button>
@@ -319,10 +319,10 @@ export default function AdminModal({ isOpen, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="pt-2 text-center border-t border-gray-200 dark:border-gray-700">
+        <div className="pt-2 text-center border-t border-slate-100 dark:border-slate-700">
           <button
             onClick={onClose}
-            className="text-xs font-black text-[#00a651] hover:underline uppercase tracking-wider py-1"
+            className="text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white uppercase tracking-wider py-1"
           >
             Close
           </button>
